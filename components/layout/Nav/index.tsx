@@ -8,6 +8,7 @@ import { usePolkadotContext } from '../../../contexts/PolkadotContext';
 import { useUniqueVaraContext } from '../../../contexts/UniqueVaraContext';
 import useEnvironment from '../../../services/useEnvironment';
 import { GenericUser } from '@heathmont/moon-icons-tw';
+import CreateEventModal from '../../../features/CreateEventModal';
 
 declare let window: any;
 let running = false;
@@ -22,7 +23,7 @@ export function Nav(): JSX.Element {
   const [Balance, setBalance] = useState('');
   const [count, setCount] = useState(0);
   const [isSigned, setSigned] = useState(false);
-  const [showCreateDaoModal, setShowCreateDaoModal] = useState(false);
+  const [showCreateEventModal, setShowCreateEventModal] = useState(false);
   const [hasJoinedCommunities, setHasJoinedCommunities] = useState(true);
   const { getCurrency, setCurrency, isServer } = useEnvironment();
 
@@ -174,10 +175,10 @@ export function Nav(): JSX.Element {
   }
 
   function closeModal() {
-    setShowCreateDaoModal(false);
+    setShowCreateEventModal(false);
   }
   function openModal() {
-    setShowCreateDaoModal(true);
+    setShowCreateEventModal(true);
   }
 
   return (
@@ -187,9 +188,8 @@ export function Nav(): JSX.Element {
           {isSigned && (
             <span className="hidden sm:inline-flex">
               {hasJoinedCommunities && <NavItem highlight={router.pathname === '/joined'} link="/joined" label="Joined charities" />}
-              <NavItem highlight={router.pathname === '/daos'} link="/daos" label="Charities" />
-              <NavItem label="Create Your Charity" onClick={openModal} />
               <NavItem highlight={router.pathname === '/events'} link="/events" label="All events" />
+              <NavItem label="Create Your Event" onClick={openModal} />
             </span>
           )}
 
@@ -243,6 +243,7 @@ export function Nav(): JSX.Element {
           </li>
         </ul>
       </nav>
+      <CreateEventModal open={showCreateEventModal} onClose={closeModal} />
     </>
   );
 }

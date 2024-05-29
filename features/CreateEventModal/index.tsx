@@ -12,9 +12,9 @@ import Required from '../../components/components/Required';
 
 import { toast } from 'react-toastify';
 import useEnvironment from '../../services/useEnvironment';
- declare let window;
+declare let window;
 let addedDate = false;
-export default function CreateEventModal({ open, onClose, daoId }) {
+export default function CreateEventModal({ open, onClose }) {
   const [EventImage, setEventImage] = useState([]);
   const [creating, setCreating] = useState(false);
   const { sendTransaction } = useContract();
@@ -54,10 +54,12 @@ export default function CreateEventModal({ open, onClose, daoId }) {
     id: 'event'
   });
 
+  let daoId = null;
+
   async function CheckTransaction() {
     let params = new URL(window.location.href).searchParams;
     if (params.get('transactionHashes') !== null) {
-      window.location.href = `/daos`;
+      window.location.href = `/events`;
     }
   }
 
@@ -149,7 +151,7 @@ export default function CreateEventModal({ open, onClose, daoId }) {
         feed.eventid = 'm_' + eventid;
 
         // Creating Event in Smart contract
-        await sendTransaction(await window.contractUnique.populateTransaction.create_event(JSON.stringify(createdObject),window.signerAddress, daoId, Number(window.userid), JSON.stringify(feed)));
+        await sendTransaction(await window.contractUnique.populateTransaction.create_event(JSON.stringify(createdObject), window.signerAddress, daoId, Number(window.userid), JSON.stringify(feed)));
         toast.update(ToastId, {
           render: 'Created Successfully!',
           type: 'success',

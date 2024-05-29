@@ -3,13 +3,11 @@ import EventCard from '../../components/components/EventCard';
 import { CharityEvent } from '../../data-model/event';
 
 export default function Events() {
- 
-
   return (
     <>
       <Head>
-        <title>DAOnation - Events</title>
-        <meta name="description" content="DAOnation - Events" />
+        <title>Fundefi - Events</title>
+        <meta name="description" content="Fundefi - Events" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <div className="flex items-center flex-col gap-8">

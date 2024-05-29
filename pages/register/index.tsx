@@ -75,7 +75,7 @@ export default function Register() {
     <>
       <Head>
         <title>Register</title>
-        <meta name="description" content="DAOnation - Register" />
+        <meta name="description" content="Fundefi - Register" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <div className="flex items-center flex-col gap-8">

@@ -4,25 +4,24 @@ import Head from 'next/head';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
-import { usePolkadotContext } from '../../../../../contexts/PolkadotContext';
-import { useUniqueVaraContext } from '../../../../../contexts/UniqueVaraContext';
-import DonateCoinToEventModal from '../../../../../features/DonateCoinToEventModal';
-import useContract from '../../../../../services/useContract';
-import useEnvironment from '../../../../../services/useEnvironment';
-import DonateNFTModal from '../../../../../features/DonateNFTModal';
-import Loader from '../../../../../components/components/Loader';
+import { usePolkadotContext } from '../../../contexts/PolkadotContext';
+import { useUniqueVaraContext } from '../../../contexts/UniqueVaraContext';
+import DonateCoinToEventModal from '../../../features/DonateCoinToEventModal';
+import useContract from '../../../services/useContract';
+import useEnvironment from '../../../services/useEnvironment';
+import DonateNFTModal from '../../../features/DonateNFTModal';
+import Loader from '../../../components/components/Loader';
 import Link from 'next/link';
-import { NFT } from '../../../../../data-model/nft';
-import NFTCard from '../../../../../components/components/NFTCard';
-import BidHistoryModal from '../../../../../features/BidHistoryModal';
-import PlaceHigherBidModal from '../../../../../features/PlaceHigherBidModal';
-import { Dao } from '../../../../../data-model/dao';
+import { NFT } from '../../../data-model/nft';
+import NFTCard from '../../../components/components/NFTCard';
+import BidHistoryModal from '../../../features/BidHistoryModal';
+import PlaceHigherBidModal from '../../../features/PlaceHigherBidModal';
 
 export default function Events() {
   //Variables
   const [nfts, setNfts] = useState([]);
   const { api, getUserInfoById, GetAllDaos } = usePolkadotContext();
-  const { GetAllNfts,GetAllEvents} = useUniqueVaraContext();
+  const { GetAllNfts, GetAllEvents } = useUniqueVaraContext();
   const [eventIdTxt, setEventTxtID] = useState('');
   const { contract } = useContract();
   const [showCreateGoalModal, setShowDonateNFTModal] = useState(false);
@@ -30,8 +29,7 @@ export default function Events() {
   const [EventID, setEventID] = useState(-1);
   const [loading, setLoading] = useState(true);
   const [tabIndex, setTabIndex] = useState(0);
-  
-  const [EventDAOURI, setEventDAOURI] = useState({} as Dao);
+
   const [eventType, setEventType] = useState('polkadot');
   const [showBidHistoryModal, setShowBidHistoryModal] = useState<NFT | null>(null);
   const [showPlaceHigherBidModal, setShowPlaceHigherBidModal] = useState<NFT | null>(null);
@@ -53,7 +51,7 @@ export default function Events() {
     wallet: '',
     logo: '',
     isOwner: true,
-    status:""
+    status: ''
   });
 
   const mockInfo = {
@@ -100,12 +98,10 @@ export default function Events() {
 
   useEffect(() => {
     getEventID();
-    fetchData()
+    fetchData();
   }, [contract, api, router]);
 
   async function fetchData() {
- ;
-
     if (router.query.daoId) {
       fetchContractDataFull();
     }
@@ -139,10 +135,8 @@ export default function Events() {
         let eventNFTs = allNfts.filter((e) => e.eventid == eventIdTxt.toString());
 
         setNfts(eventNFTs);
-        
+
         let allDaos = await GetAllDaos();
-        let eventDAO = allDaos.filter((e) => e.daoId == eventURIFull.daoId)[0];
-        setEventDAOURI(eventDAO);
 
         let user_info = await getUserInfoById(Number(eventURIFull.UserId));
         eventURIFull.user_info = user_info;
@@ -194,10 +188,7 @@ export default function Events() {
                 width={300}
                 element={
                   <h5 className="font-semibold">
-                    <Link className="text-piccolo" href={`../../${router.query.daoId}`}>
-                      {EventDAOURI?.Title}
-                    </Link>{' '}
-                    &gt; Event
+                    <Link className="text-piccolo" href={`../../${router.query.daoId}`}></Link> &gt; Event
                   </h5>
                 }
               />
@@ -267,7 +258,7 @@ export default function Events() {
                 Distribute NFTs to highest bidder
               </Button>
               <div className="flex flex-1 flex-col justify-end text-center text-trunks text-moon-12">
-                99.9% of the proceeds go to the charity. <br /> Just 0.1% goes to DAOnation.
+                99.9% of the proceeds go to the charity. <br /> Just 0.1% goes to Fundefi.
               </div>
             </div>
           </div>
@@ -275,7 +266,7 @@ export default function Events() {
         {tabIndex === 1 && (
           <div className="container mt-[-2rem] w-full flex flex-wrap gap-6">
             {nfts.map((item, i) => (
-              <NFTCard className="w-2/4"  item={item} key={i} onShowBidHistory={() => setShowBidHistoryModal(item)} onShowPlaceHigherBid={() => setShowPlaceHigherBidModal(item)} />
+              <NFTCard className="w-2/4" item={item} key={i} onShowBidHistory={() => setShowBidHistoryModal(item)} onShowPlaceHigherBid={() => setShowPlaceHigherBidModal(item)} />
             ))}
           </div>
         )}
@@ -288,4 +279,3 @@ export default function Events() {
     </>
   );
 }
-

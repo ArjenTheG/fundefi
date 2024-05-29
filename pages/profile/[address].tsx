@@ -5,7 +5,7 @@ import { ControlsExpandAlt, FilesGeneric, SoftwareLogOut } from '@heathmont/moon
 import Head from 'next/head';
 import SummaryPanel from '../../features/SummaryPanel';
 import useContract from '../../services/useContract';
-import PolkadotConfig from '../../contexts/json/polkadot-config.json' 
+import PolkadotConfig from '../../contexts/json/polkadot-config.json';
 import { useRouter } from 'next/router';
 import { usePolkadotContext } from '../../contexts/PolkadotContext';
 import { ProfileStats } from '../../features/SummaryPanel/Stats';
@@ -218,7 +218,7 @@ export default function Profile() {
         </div>
       </div>
       <div className="container py-10">
-        {tabIndex === 0 && <SummaryPanel Daos={Daos} Goals={Goals} Ideas={Ideas} loggedUser={loggedUser} loading={loading} stats={stats} />}
+        {tabIndex === 0 && <SummaryPanel loading={loading} stats={stats} />}
         {tabIndex === 1 && <CollectiblesPanel />}
         {tabIndex === 2 && <BadgesPanel badges={UserBadges} />}
         {tabIndex === 3 && <TransactionsPanel />}

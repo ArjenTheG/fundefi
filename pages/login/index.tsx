@@ -5,7 +5,6 @@ import { useRouter } from 'next/router';
 
 export default function Login() {
   const [isConnected, setIsConnected] = useState(false);
-  const [hasMetamask, setHasMetamask] = useState(false);
   const [hasPolkadot, setHasPolkadot] = useState(false);
   const [step, setStep] = useState(1);
 
@@ -15,15 +14,12 @@ export default function Login() {
   }, []);
 
   useEffect(() => {
-    if ((hasMetamask || hasPolkadot) && isConnected) {
+    if (hasPolkadot && isConnected) {
       window.location.href = '/joined';
     }
-  }, [hasMetamask, hasPolkadot, isConnected, router]); // Dependency array
+  }, [hasPolkadot, isConnected, router]); // Dependency array
 
   const setConnectionStatus = () => {
-    if (window.ethereum) {
-      setHasMetamask(true);
-    }
     if (window.injectedWeb3) {
       setHasPolkadot(true);
     }
@@ -32,62 +28,7 @@ export default function Login() {
     } else {
       setIsConnected(false);
     }
-
-    if (window.localStorage.getItem('login-type') === 'metamask') {
-      setIsConnected(true);
-    } else {
-      setIsConnected(false);
-    }
   };
-
-  async function onConnectMetamask() {
-    if (!hasMetamask) {
-      window.open('https://chrome.google.com/webstore/detail/metamask/nkbihfbeogaeaoehlefnkodbefgpgknn', '_blank');
-      return;
-    }
-
-    let result = await window.ethereum.request({ method: 'eth_requestAccounts' });
-    result;
-
-    try {
-      const getacc = await window.ethereum.request({
-        method: 'wallet_switchEthereumChain',
-        params: [{ chainId: '0x507' }] //1287
-      });
-      getacc;
-    } catch (switchError) {
-      // This error code indicates that the chain has not been added to MetaMask.
-      if (switchError.code === 4902) {
-        try {
-          await window.ethereum.request({
-            method: 'wallet_addEthereumChain',
-            params: [
-              {
-                chainId: '0x507', //1287
-                chainName: 'Moonbeam Alpha',
-                nativeCurrency: {
-                  name: 'DEV',
-                  symbol: 'DEV',
-                  decimals: 18
-                },
-                rpcUrls: ['https://rpc.api.moonbase.moonbeam.network']
-              }
-            ]
-          });
-        } catch (addError) {
-          // handle "add" error
-          console.log(addError);
-        }
-      }
-      // handle other "switch" errors
-    }
-
-    window.localStorage.setItem('loggedin', 'true');
-    window.localStorage.setItem('login-type', 'metamask');
-
-    setIsConnected(true);
-    setHasMetamask(true);
-  }
 
   async function onConnectPolkadot() {
     if (!hasPolkadot) {
@@ -106,7 +47,7 @@ export default function Login() {
     <>
       <Head>
         <title>Login</title>
-        <meta name="description" content="DAOnation - Login" />
+        <meta name="description" content="Fundefi - Login" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <div className={`gap-8 flex w-full bg-gohan pt-10 pb-6 border-beerus border`}>
@@ -115,7 +56,7 @@ export default function Login() {
           <p>Step {step} of 2</p>
         </div>
       </div>
-      <div className="container flex flex-col items-center pt-10 gap-10">{<LoginCard setStep={setStep} step={step} onConnectPolkadot={onConnectPolkadot} onConnectMetamask={onConnectMetamask} />}</div>
+      <div className="container flex flex-col items-center pt-10 gap-10">{<LoginCard setStep={setStep} step={step} onConnectPolkadot={onConnectPolkadot} />}</div>
     </>
   );
 }

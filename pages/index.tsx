@@ -17,8 +17,8 @@ export default function Welcome() {
   return (
     <>
       <Head>
-        <title>DAOnation</title>
-        <meta name="description" content="DAOnation" />
+        <title>Fundefi</title>
+        <meta name="description" content="Fundefi" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <div className="bg-roshi w-full pb-16 md:min-h-full-min-header flex flex-col items-center gap-8 px-4">

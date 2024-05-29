@@ -63,20 +63,20 @@ export default function JoinCommunityModal({ SubsPrice, show, onHide, address, r
     const daoIdNumber = Number(daoId.split('_')[1]);
 
     setisLoading(true);
-    const id = toast.loading('Joining charity ...');
+    const id = toast.loading('Joining event ...');
     let feed = JSON.stringify({
       daoId: daoId,
       name: userInfo?.fullName?.toString()
     });
     async function onSuccess() {
-      router.push(`/daos/${daoId}`);
+      router.push(`/events/${daoId}`);
       LoadData();
       setisLoading(false);
       onHide({ success: true });
     }
     if (Coin == 'DOT') {
       toast.update(id, {
-        render: 'Joining charity....'
+        render: 'Joining event....'
       });
       let recipient = recievetype == 'Polkadot' ? recieveWallet : address;
       const txs = [api.tx.balances.transferAllowDeath(recipient, `${Amount * 1e12}`), api._extrinsics.daos.joinCommunity(daoId, Number(window.userid), new Date().toLocaleDateString(), feed), api._extrinsics.feeds.addFeed(feed, 'join', new Date().valueOf())];
