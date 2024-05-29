@@ -216,7 +216,7 @@ export default function CreateEventModal({ open, onClose }) {
   return (
     <Modal open={open} onClose={onClose}>
       <Modal.Backdrop />
-      <Modal.Panel className="bg-gohan w-[90%] max-w-[600px] max-h-[90vh]">
+      <Modal.Panel className="bg-gohan absolute top-0 left-0 w-screen h-screen max-h-none max-w-none sm:relative sm:h-auto sm:w-[90%] sm:max-w-[600px] sm:max-h-[95vh] !rounded-none sm:!rounded-xl">
         <div className={`flex items-center justify-center flex-col`}>
           <div className="flex justify-between items-center w-full border-b border-beerus py-4 px-6">
             <h1 className="text-moon-20 font-semibold">Create event</h1>
@@ -271,11 +271,11 @@ export default function CreateEventModal({ open, onClose }) {
             </div>
           </div>
         </div>
-        <div className="flex justify-between border-t border-beerus w-full p-6">
-          <Button variant="ghost" onClick={onClose}>
+        <div className="flex justify-between border-t gap-4 border-beerus w-full p-6 absolute bottom-0">
+          <Button variant="ghost" onClick={onClose} className="flex-1 sm:flex-none">
             Cancel
           </Button>
-          <Button id="CreateEventBTN" animation={creating ? 'progress' : false} disabled={creating || isInvalid()} onClick={createEvent}>
+          <Button className="flex-1 sm:flex-none" animation={creating ? 'progress' : false} disabled={creating || isInvalid()} onClick={createEvent}>
             <ControlsPlus className="text-moon-24" />
             Create event
           </Button>

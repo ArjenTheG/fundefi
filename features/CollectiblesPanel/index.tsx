@@ -36,7 +36,7 @@ const CollectiblesPanel = () => {
 
   return (
     <Card>
-      <div className="w-full flex flex-wrap gap-6">{mockNFTs && mockNFTs.length > 0 ? mockNFTs.map((nft, i) => <NFTCard className="!w-2/4 !max-w-[364px] border-beerus border !shadow-none" item={nft} key={i} display={true} />) : <>You don't have activity yet</>}</div>
+      <div className="w-full flex flex-wrap gap-6 justify-center md:justify-normal">{mockNFTs && mockNFTs.length > 0 ? mockNFTs.map((nft, i) => <NFTCard className="w-full sm:!w-2/4 !max-w-[364px] border-beerus border !shadow-none" item={nft} key={i} display={true} />) : <>You don't have activity yet</>}</div>
     </Card>
   );
 };

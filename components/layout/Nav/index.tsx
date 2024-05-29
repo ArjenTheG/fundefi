@@ -169,9 +169,7 @@ export function Nav(): JSX.Element {
   }, 1000);
 
   function onClickDisConnect() {
-    window.localStorage.setItem('loggedin', '');
-    window.localStorage.setItem('login-type', '');
-    window.location.href = '/';
+    router.push('logout');
   }
 
   function closeModal() {

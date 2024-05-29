@@ -3,12 +3,10 @@ import { useEffect, useState } from 'react';
 import { Avatar, Button, IconButton, Tabs } from '@heathmont/moon-core-tw';
 import { ControlsExpandAlt, FilesGeneric, SoftwareLogOut } from '@heathmont/moon-icons-tw';
 import Head from 'next/head';
-import SummaryPanel from '../../features/SummaryPanel';
 import useContract from '../../services/useContract';
 import PolkadotConfig from '../../contexts/json/polkadot-config.json';
 import { useRouter } from 'next/router';
 import { usePolkadotContext } from '../../contexts/PolkadotContext';
-import { ProfileStats } from '../../features/SummaryPanel/Stats';
 import TransactionsPanel from '../../features/TransactionsPanel';
 import BadgesPanel from '../../features/BadgesPanel';
 import CollectiblesPanel from '../../features/CollectiblesPanel';
@@ -16,11 +14,8 @@ import CollectiblesPanel from '../../features/CollectiblesPanel';
 export default function Profile() {
   const { contract } = useContract();
 
-  const { api, getUserInfoById, GetAllDaos, GetAllIdeas, GetAllGoals, GetAllJoined, GetAllVotes, GetAllUserDonations, PolkadotLoggedIn } = usePolkadotContext();
-  const [Goals, setGoals] = useState([]);
-  const [Ideas, setIdeas] = useState([]);
+  const { api, getUserInfoById, GetAllDaos, GetAllIdeas, GetAllGoals, GetAllJoined, GetAllVotes, GetAllUserDonations } = usePolkadotContext();
   const [loading, setLoading] = useState(true);
-  const [Daos, setDaos] = useState([]);
   const [UserBadges, setUserBadges] = useState({
     dao: false,
     joined: false,
@@ -36,7 +31,6 @@ export default function Profile() {
   const [tabIndex, setTabIndex] = useState(0);
   const [loggedUser, setLoggedUser] = useState(false);
   const [signerAddress, setSignerAddress] = useState('');
-  const [stats, setStats] = useState({} as ProfileStats);
 
   const router = useRouter();
 
@@ -117,44 +111,8 @@ export default function Profile() {
       }
     }
 
-    // let _reply_ids = await contract._reply_ids();
-    // for (let i = 0; i < _reply_ids; i++) {
-    // 	let repliesURI = await contract.all_replies(i);
-    // 	if (JSON.parse(repliesURI.message).userid == user_id) {
-    // 		ideasReplied += 1;
-    // 		let ideaURI = JSON.parse((await window.contract._ideas_uris(Number(repliesURI.ideas_id))).ideas_uri);
-
-    // 		let parsed_rplied = JSON.parse(repliesURI.message);
-    // 		parsed_rplied.idea = ideaURI;
-    // 		allMessages.push(parsed_rplied);
-
-    // 		let existsIdea = MessagesIdeasURIS.findIndex(e => e.id == Number(repliesURI.ideas_id));
-    // 		if (existsIdea != -1) {
-    // 			MessagesIdeasURIS[existsIdea].replied += 1;
-    // 			continue;
-    // 		}
-
-    // 		ideaURI.replied = 1;
-    // 		ideaURI.id = Number(repliesURI.ideas_id);
-    // 		MessagesIdeasURIS.push(ideaURI);
-    // 	}
-    // }
-
-    setDaos(founddao);
-    setGoals(foundGoals);
-    setIdeas(foundidea);
-
     setUserBadges(allBadges);
 
-    setStats({
-      daosCreated: founddao.length,
-      goalsCreated: foundGoals.length,
-      ideasCreated: foundidea.length,
-      commentsCreated: ideasReplied,
-      donated: donated,
-      donationsReceived: totalDonationsRecieved,
-      commentsReceived: null
-    });
     setLoading(false);
   }
 
@@ -167,9 +125,7 @@ export default function Profile() {
   }
 
   function logout() {
-    window.localStorage.setItem('loggedin', '');
-    window.localStorage.setItem('login-type', '');
-    window.location.href = '/';
+    router.push('logout');
   }
 
   return (
@@ -180,7 +136,7 @@ export default function Profile() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <div className={`gap-8 flex flex-col w-full bg-gohan pt-10 border-beerus border`}>
-        <div className="container flex w-full justify-between relative">
+        <div className="container flex flex-col gap-4 sm:flex-row w-full justify-between relative">
           <div className="flex gap-2 items-center">
             <div className="relative">
               <Avatar className="rounded-full border border-beerus bg-gohan text-moon-80 h-20 w-20" imageUrl={'https://' + UserInfo?.imgIpfs?.toString() + '.ipfs.nftstorage.link'} />
@@ -189,18 +145,18 @@ export default function Profile() {
 
             <div className="flex flex-col gap-2">
               <h1 className="font-bold text-moon-32 text-piccolo">{UserInfo?.fullName?.toString()}</h1>
-              <h3 className="text-trunks">{signerAddress}</h3>
+              <h3 className="text-trunks break-all">{signerAddress}</h3>
             </div>
           </div>
-          <div className="flex flex-col gap-2">
+          <div className="flex sm:flex-col gap-2">
             {loggedUser && (
-              <Button iconLeft={<ControlsExpandAlt />} onClick={goToFaucet}>
+              <Button iconLeft={<ControlsExpandAlt />} onClick={goToFaucet} className="flex-1">
                 Add coin
               </Button>
             )}
 
             {loggedUser && (
-              <Button variant="secondary" iconLeft={<SoftwareLogOut />} onClick={logout}>
+              <Button variant="secondary" iconLeft={<SoftwareLogOut />} onClick={logout} className="flex-1">
                 Log out
               </Button>
             )}
@@ -209,7 +165,6 @@ export default function Profile() {
         <div className="container">
           <Tabs selectedIndex={tabIndex} onChange={setTabIndex}>
             <Tabs.List>
-              <Tabs.Tab>Summary</Tabs.Tab>
               <Tabs.Tab>Collectibles</Tabs.Tab>
               <Tabs.Tab>Badges</Tabs.Tab>
               <Tabs.Tab>Transactions</Tabs.Tab>
@@ -218,10 +173,9 @@ export default function Profile() {
         </div>
       </div>
       <div className="container py-10">
-        {tabIndex === 0 && <SummaryPanel loading={loading} stats={stats} />}
-        {tabIndex === 1 && <CollectiblesPanel />}
-        {tabIndex === 2 && <BadgesPanel badges={UserBadges} />}
-        {tabIndex === 3 && <TransactionsPanel />}
+        {tabIndex === 0 && <CollectiblesPanel />}
+        {tabIndex === 1 && <BadgesPanel badges={UserBadges} />}
+        {tabIndex === 2 && <TransactionsPanel />}
       </div>
     </>
   );
