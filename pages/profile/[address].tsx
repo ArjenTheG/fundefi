@@ -144,7 +144,7 @@ export default function Profile() {
             </div>
 
             <div className="flex flex-col gap-2">
-              <h1 className="font-bold text-moon-32 text-piccolo">{UserInfo?.fullName?.toString()}</h1>
+              <h1 className="font-bold text-moon-32 text-raditz">{UserInfo?.fullName?.toString()}</h1>
               <h3 className="text-trunks break-all">{signerAddress}</h3>
             </div>
           </div>

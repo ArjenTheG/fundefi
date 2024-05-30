@@ -106,7 +106,7 @@ export default function Login() {
     <>
       <Head>
         <title>Login</title>
-        <meta name="description" content="PlanetDAO - Login" />
+        <meta name="description" content="Fundefi - Login" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <div className={`gap-8 flex w-full bg-gohan pt-10 pb-6 border-beerus border`}>

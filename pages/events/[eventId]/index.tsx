@@ -188,7 +188,7 @@ export default function Events() {
                 width={300}
                 element={
                   <h5 className="font-semibold">
-                    <Link className="text-piccolo" href={`../../${router.query.daoId}`}></Link> &gt; Event
+                    <Link className="text-raditz" href={`../../${router.query.daoId}`}></Link> &gt; Event
                   </h5>
                 }
               />
@@ -202,7 +202,7 @@ export default function Events() {
                     <div>•</div>
                     <div className="flex">
                       Created by &nbsp;
-                      <a href={'/profile/' + EventURI.user_info.id} className="truncate text-piccolo max-w-[120px]">
+                      <a href={'/profile/' + EventURI.user_info.id} className="truncate text-raditz max-w-[120px]">
                         @{EventURI.user_info.fullName}
                       </a>
                     </div>
@@ -228,7 +228,7 @@ export default function Events() {
                 </Link>
               )} */}
               {/* {isOwner && (
-                <Button iconLeft={<GenericDelete />} className="bg-dodoria" onClick={deleteDao}>
+                <Button iconLeft={<GenericDelete />} className="bg-raditz" onClick={deleteDao}>
                   Delete
                 </Button>
               )} */}

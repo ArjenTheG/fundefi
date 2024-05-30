@@ -185,7 +185,7 @@ export function Nav(): JSX.Element {
         <ul className="flex justify-between items-center w-full">
           {isSigned && (
             <span className="hidden sm:inline-flex">
-              {hasJoinedCommunities && <NavItem highlight={router.pathname === '/joined'} link="/joined" label="Joined charities" />}
+              {hasJoinedCommunities && <NavItem highlight={router.pathname === '/joined'} link="/joined" label="Joined events" />}
               <NavItem highlight={router.pathname === '/events'} link="/events" label="All events" />
               <NavItem label="Create Your Event" onClick={openModal} />
             </span>
@@ -194,12 +194,12 @@ export function Nav(): JSX.Element {
           <li className="Nav walletstatus flex flex-1 justify-end">
             <div className="flex flex-col gap-2 items-center sm:flex-row" id="withoutSign">
               <Link href="/register">
-                <Button variant="secondary" className="!bg-transparent w-32">
+                <Button variant="primary" className="bg-white text-pop w-32">
                   Register
                 </Button>
               </Link>
               <Link href="/login">
-                <Button className="bg-dodoria w-32">Log in</Button>
+                <Button className="bg-raditz w-32">Log in</Button>
               </Link>
             </div>
 
@@ -208,16 +208,16 @@ export function Nav(): JSX.Element {
                 <div className="wallet__wrapper gap-4 flex items-center">
                   <div className="wallet__info flex flex-col items-end">
                     <Link href={'/profile/' + user_id} rel="noreferrer" className="max-w-[250px]">
-                      <div className="font-medium text-piccolo truncate">{acc}</div>
+                      <div className="font-medium text-raditz truncate">{acc}</div>
                     </Link>
-                    <div className="font-semibold truncate">{Balance}</div>
+                    <div className="font-semibold truncate text-gohan">{Balance}</div>
                   </div>
                   <Dropdown value={null} onChange={null}>
                     <Dropdown.Trigger>
                       {logo ? (
-                        <Avatar imageUrl={'https://' + logo + '.ipfs.nftstorage.link'} size="lg" className="rounded-full border-2 border-piccolo"></Avatar>
+                        <Avatar imageUrl={'https://' + logo + '.ipfs.nftstorage.link'} size="lg" className="rounded-full border-2 border-raditz"></Avatar>
                       ) : (
-                        <Avatar size="lg" className="rounded-full border-2 border-piccolo">
+                        <Avatar size="lg" className="rounded-full border-2 border-raditz">
                           {' '}
                           <GenericUser className="text-moon-24" />
                         </Avatar>

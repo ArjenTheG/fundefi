@@ -29,7 +29,10 @@ const NFTCard = ({ item, className, onShowBidHistory, onShowPlaceHigherBid, disp
               </span>
             </p>
             <p>
-              by <span className="text-piccolo">{item.highest_bidder.substring(0,10)}...{item.highest_bidder.substring(item.highest_bidder.length - 10, item.highest_bidder.length)}</span>
+              by{' '}
+              <span className="text-raditz">
+                {item.highest_bidder.substring(0, 10)}...{item.highest_bidder.substring(item.highest_bidder.length - 10, item.highest_bidder.length)}
+              </span>
             </p>
           </div>
           <div className="flex flex-col gap-2 w-full items-center">

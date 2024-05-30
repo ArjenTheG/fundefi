@@ -36,7 +36,7 @@ const TransactionsPanel = () => {
       description: (
         <span>
           Monthly subscription for "
-          <a className="text-piccolo" href="/events/m_0">
+          <a className="text-raditz" href="/events/m_0">
             DAO
           </a>
           "
@@ -49,7 +49,7 @@ const TransactionsPanel = () => {
       description: (
         <span>
           Monthly subscription for "
-          <a className="text-piccolo" href="/events/m_0">
+          <a className="text-raditz" href="/events/m_0">
             Concious Nona
           </a>
           "

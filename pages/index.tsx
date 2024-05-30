@@ -21,17 +21,17 @@ export default function Welcome() {
         <meta name="description" content="Fundefi" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <div className="bg-roshi w-full pb-16 md:min-h-full-min-header flex flex-col items-center gap-8 px-4">
-        <div className="flex flex-col gap-4 items-center text-gohan mt-16 max-w-[900px] text-center">
+      <div className="w-full pb-16 md:min-h-full-min-header flex flex-col items-center gap-8 px-4">
+        <div className="flex flex-col gap-4 items-center text-popo mt-16 max-w-[900px] text-center">
           <h2 className="font-bold text-moon-48">Maximize charity impact through decentralized innovation</h2>
           <h5>Empower your charity's mission with DAOs, custom pages, community goals, and crypto-NFT events. Unlock the unparalleled value of decentralized giving.</h5>
         </div>
         <Link href="/register">
-          <Button className="shadow-moon-md bg-dodoria">Get started</Button>
+          <Button className="shadow-moon-md bg-piccolo">Get started</Button>
         </Link>
         <Image src="/home/charity-example.png" height={500} width={900} alt="" />
       </div>
-      <div className="bg-gohan flex flex-col gap-20 text-brief py-16">
+      <div className="bg-popo flex flex-col gap-20 text-gohan py-16">
         <div className="flex homepage-container flex-col-reverse items-center md:flex-row md:gap-16 md:items-start">
           <div className="flex flex-col gap-8 pt-10">
             <h3 className="text-moon-32 font-bold">Decentralized empowerment with DAOs</h3>
@@ -39,6 +39,8 @@ export default function Welcome() {
           </div>
           <Image className="shrink-0" src="/home/decentralized.png" alt="" width={360} height={336} />
         </div>
+      </div>
+      <div className="bg-gohan flex flex-col gap-20 text-popo py-16">
         <div className="flex homepage-container flex-col items-center md:flex-row md:gap-16 md:items-start">
           <Image className="shrink-0" src="/home/craft.png" alt="" width={380} height={424} />
           <div className="flex flex-col gap-8 pt-10">
@@ -47,7 +49,7 @@ export default function Welcome() {
           </div>
         </div>
       </div>
-      <div className="bg-roshi flex flex-col gap-20 text-gohan py-16">
+      <div className="bg-piccolo flex flex-col gap-20 text-gohan py-16">
         <div className="flex homepage-container flex-col-reverse items-center md:flex-row md:gap-16 md:items-start">
           <div className="flex flex-col gap-8 pt-10">
             <h3 className="text-moon-32 font-bold">Community-driven charity goals</h3>

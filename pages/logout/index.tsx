@@ -11,7 +11,7 @@ export default function Logout() {
     <>
       <Head>
         <title>Logout</title>
-        <meta name="description" content="PlanetDAO - Logout" />
+        <meta name="description" content="Fundefi - Logout" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <div className={`gap-8 flex w-full bg-gohan pt-10 pb-6 border-beerus border`}>

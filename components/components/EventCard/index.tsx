@@ -22,15 +22,18 @@ const EventCard = ({ item, className = '', onClickDonate }: { item: CharityEvent
         </div>
         <div className="flex flex-1 flex-col gap-2 relative px-5 text-moon-16">
           <p className="font-semibold text-moon-18">{item.Title}</p>
-          <div className="hidden sm:inline-block">
+          <p className="text-trunks">
+            By {'Thomas Goethals'} <br /> Ends in 4h25m
+          </p>
+          <div className="sm:inline-block">
             <p className="font-semibold text-moon-20 text-hit">
               {getCurrency()} {item?.reached?.toString()}
             </p>
             <p>
-              reached of {getCurrency()} {item.Budget} goal
+              raised of {getCurrency()} {item.Budget} goal
             </p>
           </div>
-          <div className="flex gap-2 sm:block items-center">
+          <div className="hidden gap-2 sm:block items-center ">
             <p className="font-semibold text-moon-20 text-hit">{item?.amountOfNFTs}</p>
             <p>NFTs</p>
           </div>

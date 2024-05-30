@@ -225,7 +225,7 @@ export default function JoinCommunityModal({ SubsPrice, show, onHide, address, r
             </div>
 
             {/* {Amount > Balance ? (
-              <p className="pt-5 text-right text-dodoria">Insufficient funds</p>
+              <p className="pt-5 text-right text-raditz">Insufficient funds</p>
             ) : (
               <p className="pt-5 text-right">
                 Your balance is {Balance} {Coin}

@@ -1,3 +1,3 @@
-const Required = () => <span className="text-dodoria">*</span>;
+const Required = () => <span className="text-raditz">*</span>;
 
 export default Required;
