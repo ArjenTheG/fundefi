@@ -1,4 +1,3 @@
-import { ThemeProvider } from 'next-themes';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -16,15 +15,13 @@ function MyApp({ Component, pageProps }) {
   return (
     <UtilsProvider>
       <UniqueVaraProvider>
-      <PolkadotProvider>
-        <EnvironmentProvider>
-          <ThemeProvider defaultTheme={'dark'} enableColorScheme={false} attribute="class" enableSystem={false}>
+        <PolkadotProvider>
+          <EnvironmentProvider>
             <Header />
             <Component {...pageProps} />
             <ToastContainer hideProgressBar={false} position="top-right" autoClose={3000} newestOnTop={false} closeOnClick rtl={false} draggable pauseOnHover theme="light" />
-          </ThemeProvider>
-        </EnvironmentProvider>
-      </PolkadotProvider>
+          </EnvironmentProvider>
+        </PolkadotProvider>
       </UniqueVaraProvider>
     </UtilsProvider>
   );

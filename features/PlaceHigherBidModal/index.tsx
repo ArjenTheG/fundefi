@@ -44,7 +44,7 @@ export default function PlaceHigherBidModal({ open, onClose, item }: { open: boo
             <IconButton className="text-trunks" variant="ghost" icon={<ControlsClose />} onClick={onClose} />
           </div>
           <div className="flex flex-col gap-6 w-full max-h-[calc(90vh-162px)]">
-            <form id="doanteForm" autoComplete="off">
+            <form id="donateForm" autoComplete="off">
               <div className="flex flex-col gap-2 py-16 px-6">
                 <div className="flex items-center ">
                   <span className="font-semibold flex-1">Total</span>

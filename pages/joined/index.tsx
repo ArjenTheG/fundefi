@@ -42,9 +42,9 @@ export const Joined = () => {
           }
         });
 
-        if (arrList.length === 0) {
-          router.push('/events');
-        }
+        // if (arrList.length === 0) {
+        //   router.push('/events');
+        // }
 
         setList(arrList.reverse());
       }

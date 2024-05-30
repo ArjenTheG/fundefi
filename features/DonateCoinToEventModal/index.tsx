@@ -9,13 +9,13 @@ import { useUtilsContext } from '../../contexts/UtilsContext';
 
 declare let window;
 export default function DonateCoinToEventModal({ open, onClose, eventName }) {
-  const [Balance, setBalance] = useState("");
+  const [Balance, setBalance] = useState('');
   const [BalanceAmount, setBalanceAmount] = useState(0);
   const [Coin, setCoin] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const {varaApi} = useUniqueVaraContext()
-  const {PolkadotLoggedIn,userWalletPolkadot,} = usePolkadotContext()
-  const {  switchNetworkByToken }: {  switchNetworkByToken: Function } = useUtilsContext();
+  const { varaApi } = useUniqueVaraContext();
+  const { PolkadotLoggedIn, userWalletPolkadot } = usePolkadotContext();
+  const { switchNetworkByToken }: { switchNetworkByToken: Function } = useUtilsContext();
 
   const { getCurrency } = useEnvironment();
 
@@ -36,7 +36,7 @@ export default function DonateCoinToEventModal({ open, onClose, eventName }) {
       if (Coin !== 'VARA') setCoin('VARA');
       const { nonce, data: balance } = await varaApi.query.system.account(userWalletPolkadot);
       setBalance((Number(balance.free.toString()) / 1e12).toString());
-      setBalanceAmount(Number(balance.free.toString())/ 1e12);
+      setBalanceAmount(Number(balance.free.toString()) / 1e12);
     }
 
     async function setMetamask() {
@@ -45,16 +45,14 @@ export default function DonateCoinToEventModal({ open, onClose, eventName }) {
       let Balance = await web3.eth.getBalance(window?.selectedAddress);
 
       setBalance((Balance / 1e18).toFixed(5));
-    
     }
 
     if (PolkadotLoggedIn && currencyChanged == false && Coin == '') {
       setPolkadotVara();
     } else if (currencyChanged == true && Coin == 'VARA') {
-      switchNetworkByToken("VARA")
+      switchNetworkByToken('VARA');
       setPolkadotVara();
     } else if (currencyChanged == true && Coin !== 'VARA' && Coin !== '') {
-     
       await window.ethereum.enable();
       setMetamask();
     }
@@ -80,7 +78,7 @@ export default function DonateCoinToEventModal({ open, onClose, eventName }) {
             <IconButton className="text-trunks" variant="ghost" icon={<ControlsClose />} onClick={onClose} />
           </div>
           <div className="flex flex-col gap-6 w-full max-h-[calc(90vh-162px)]">
-            <form id="doanteForm" autoComplete="off">
+            <form id="donateForm" autoComplete="off">
               <div className="flex flex-col gap-2 py-16 px-6">
                 <div className="flex items-center ">
                   <span className="font-semibold flex-1">Total</span>
@@ -90,11 +88,10 @@ export default function DonateCoinToEventModal({ open, onClose, eventName }) {
                     <Dropdown.Options className="bg-gohan w-48 min-w-0">
                       <Dropdown.Option value="UNQ">
                         <MenuItem>UNQ</MenuItem>
-                      </Dropdown.Option>          
+                      </Dropdown.Option>
                       <Dropdown.Option value="VARA">
                         <MenuItem>VARA</MenuItem>
-                      </Dropdown.Option>  
-                  
+                      </Dropdown.Option>
                     </Dropdown.Options>
                   </Dropdown>
                 </div>
