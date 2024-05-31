@@ -169,7 +169,7 @@ export function Nav(): JSX.Element {
   }, 1000);
 
   function onClickDisConnect() {
-    router.push('logout');
+    router.push('/logout');
   }
 
   function closeModal() {
