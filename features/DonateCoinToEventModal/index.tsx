@@ -3,8 +3,7 @@ import { Button, Dropdown, IconButton, MenuItem, Modal } from '@heathmont/moon-c
 import { ControlsClose } from '@heathmont/moon-icons-tw';
 import UseFormInput from '../../components/components/UseFormInput';
 import useEnvironment from '../../services/useEnvironment';
-import { useUniqueVaraContext } from '../../contexts/UniqueVaraContext';
-import { usePolkadotContext } from '../../contexts/PolkadotContext';
+import { useUniquePolkadotContext } from '../../contexts/UniquePolkadotContext';
 import { useUtilsContext } from '../../contexts/UtilsContext';
 import { toast } from 'react-toastify';
 
@@ -14,11 +13,8 @@ export default function DonateCoinToEventModal({ open, onClose, eventName, event
   const [BalanceAmount, setBalanceAmount] = useState(0);
   const [Coin, setCoin] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const { varaApi } = useUniqueVaraContext();
-  const { PolkadotLoggedIn, userWalletPolkadot } = usePolkadotContext();
+  const { api,PolkadotLoggedIn, userWalletPolkadot } = useUniquePolkadotContext();
   const { switchNetworkByToken }: { switchNetworkByToken: Function } = useUtilsContext();
-
-  const { getCurrency } = useEnvironment();
 
   const [Amount, AmountInput] = UseFormInput({
     defaultValue: '',
@@ -65,9 +61,9 @@ export default function DonateCoinToEventModal({ open, onClose, eventName, event
   }
 
   async function LoadData(currencyChanged = false) {
-    async function setPolkadotVara() {
-      if (Coin !== 'VARA') setCoin('VARA');
-      const { nonce, data: balance } = await varaApi.query.system.account(userWalletPolkadot);
+    async function setPolkadotNetwork() {
+      if (Coin !== 'DOT') setCoin('DOT');
+      const { nonce, data: balance } = await api.query.system.account(userWalletPolkadot);
       setBalance((Number(balance.free.toString()) / 1e12).toString());
       setBalanceAmount(Number(balance.free.toString()) / 1e12);
     }
@@ -83,12 +79,12 @@ export default function DonateCoinToEventModal({ open, onClose, eventName, event
       } catch (error) {}
     }
 
-    if (false && currencyChanged == false && Coin == '') {
-      setPolkadotVara();
-    } else if (currencyChanged == true && Coin == 'VARA') {
-      switchNetworkByToken('VARA');
-      setPolkadotVara();
-    } else if (currencyChanged == true && Coin !== 'VARA' && Coin !== '') {
+    if (PolkadotLoggedIn && currencyChanged == false && Coin == '') {
+      setPolkadotNetwork();
+    } else if (currencyChanged == true && Coin == 'DOT') {
+      switchNetworkByToken('DOT');
+      setPolkadotNetwork();
+    } else if (currencyChanged == true && Coin !== 'DOT' && Coin !== '') {
       switchNetworkByToken('UNQ');
       setMetamask();
     }
@@ -125,8 +121,8 @@ export default function DonateCoinToEventModal({ open, onClose, eventName, event
                       <Dropdown.Option value="UNQ">
                         <MenuItem>UNQ</MenuItem>
                       </Dropdown.Option>
-                      <Dropdown.Option value="VARA">
-                        <MenuItem>VARA</MenuItem>
+                      <Dropdown.Option value="DOT">
+                        <MenuItem>DOT</MenuItem>
                       </Dropdown.Option>
                     </Dropdown.Options>
                   </Dropdown>

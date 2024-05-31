@@ -7,20 +7,18 @@ import UseFormTextArea from '../../components/components/UseFormTextArea';
 import useContract from '../../services/useContract';
 import AddImageInput from '../../components/components/AddImageInput';
 import ImageListDisplay from '../../components/components/ImageListDisplay';
-import { usePolkadotContext } from '../../contexts/PolkadotContext';
 import Required from '../../components/components/Required';
 
 import { toast } from 'react-toastify';
 import useEnvironment from '../../services/useEnvironment';
-import { useUniqueVaraContext } from '../../contexts/UniqueVaraContext';
+import { useUniquePolkadotContext } from '../../contexts/UniquePolkadotContext';
 declare let window;
 let addedDate = false;
 export default function CreateEventModal({ open, onClose, daoId }) {
   const [EventImage, setEventImage] = useState([]);
   const [creating, setCreating] = useState(false);
   const { sendTransaction } = useContract();
-  const { api, userInfo, showToast, userWalletPolkadot, userSigner, PolkadotLoggedIn } = usePolkadotContext();
-  const { createEventInVara, VaraLoggedIn } = useUniqueVaraContext();
+  const { api, userInfo, showToast, userWalletPolkadot, userSigner, PolkadotLoggedIn } = useUniquePolkadotContext();
   const { isServer } = useEnvironment();
 
   //Storage API for images and videos
@@ -70,7 +68,7 @@ export default function CreateEventModal({ open, onClose, daoId }) {
     }
   }
 
-  if (!isServer()) {
+  if (!(typeof window === 'undefined')) {
     // All this kinda stuff should be in useEffects()
     CheckTransaction();
   }
@@ -143,16 +141,15 @@ export default function CreateEventModal({ open, onClose, daoId }) {
       onClose({ success: true });
       window.location.reload();
     }
-    if (VaraLoggedIn) {
-      // let eventid = Number(await api._query.events.eventIds());
-      // feed.eventid = 'p_' + eventid;
-      // const txs = [api._extrinsics.events.createEvent(JSON.stringify(createdObject), daoId, Number(window.userid), JSON.stringify(feed)), api._extrinsics.feeds.addFeed(JSON.stringify(feed), 'event', new Date().valueOf())];
-      // const transfer = api.tx.utility.batch(txs).signAndSend(userWalletPolkadot, { signer: userSigner }, (status) => {
-      //   showToast(status, ToastId, 'Created successfully!', () => {
-      //     onSuccess();
-      //   });
-      // });
-      await createEventInVara();
+    if (PolkadotLoggedIn) {
+      let eventid = Number(await api._query.events.eventIds());
+      feed.eventid = 'p_' + eventid;
+      const txs = [api._extrinsics.events.createEvent(JSON.stringify(createdObject), daoId, Number(window.userid), JSON.stringify(feed)), api._extrinsics.feeds.addFeed(JSON.stringify(feed), 'event', new Date().valueOf())];
+      const transfer = api.tx.utility.batch(txs).signAndSend(userWalletPolkadot, { signer: userSigner }, (status) => {
+        showToast(status, ToastId, 'Created successfully!', () => {
+          onSuccess();
+        });
+      });
     } else {
       try {
         const eventid = Number(await window.contractUnique._event_ids());

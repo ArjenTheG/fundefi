@@ -7,12 +7,12 @@ import UseFormTextArea from '../../components/components/UseFormTextArea';
 import Required from '../../components/components/Required';
 import Image from 'next/image';
 import { toast } from 'react-toastify';
-import { usePolkadotContext } from '../../contexts/PolkadotContext';
+import { useUniquePolkadotContext } from '../../contexts/UniquePolkadotContext';
 import useContract from '../../services/useContract';
 declare let window;
 
 export default function DonateNFTModal({ open, onClose, eventName, eventid }) {
-  const { userInfo, PolkadotLoggedIn } = usePolkadotContext();
+  const { userInfo, PolkadotLoggedIn } = useUniquePolkadotContext();
   const { sendTransaction } = useContract();
   const [RecieveType, setRecieveType] = useState('Unqiue');
 

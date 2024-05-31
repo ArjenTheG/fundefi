@@ -1,1 +1,1 @@
-npm run deploy-unique
+npm run deploy

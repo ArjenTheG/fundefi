@@ -4,24 +4,21 @@ import { ControlsClose } from '@heathmont/moon-icons-tw';
 import UseFormInput from '../../components/components/UseFormInput';
 import useEnvironment from '../../services/useEnvironment';
 import { NFT } from '../../data-model/nft';
-import { useUniqueVaraContext } from '../../contexts/UniqueVaraContext';
+import { useUniquePolkadotContext } from '../../contexts/UniquePolkadotContext';
 import { useUtilsContext } from '../../contexts/UtilsContext';
 import { toast } from 'react-toastify';
-import { usePolkadotContext } from '../../contexts/PolkadotContext';
 import useContract from '../../services/useContract';
 
 declare let window;
 export default function PlaceHigherBidModal({ open, onClose, item }: { open: boolean; onClose: () => void; item: NFT }) {
   const { sendTransaction } = useContract();
 
-  const { userInfo, PolkadotLoggedIn } = usePolkadotContext();
+  const { userInfo, PolkadotLoggedIn,userWalletPolkadot,api } = useUniquePolkadotContext();
   const [BalanceAmount, setBalanceAmount] = useState(0);
   const [Coin, setCoin] = useState('UNQ');
   const [isLoading, setIsLoading] = useState(false);
-  const { VaraLoggedIn, varaApi, userWalletVara } = useUniqueVaraContext();
   const { switchNetworkByToken }: { switchNetworkByToken: Function } = useUtilsContext();
 
-  const { getCurrency } = useEnvironment();
 
   const [Amount, AmountInput] = UseFormInput({
     defaultValue: '',
@@ -80,10 +77,9 @@ export default function PlaceHigherBidModal({ open, onClose, item }: { open: boo
   }
 
   async function LoadData(currencyChanged = false) {
-    async function setPolkadotVara() {
-      if (Coin !== 'VARA') setCoin('VARA');
-      const { nonce, data: balance } = await varaApi.query.system.account(userWalletVara);
-
+    async function setPolkadotNetwork() {
+      if (Coin !== 'DOT') setCoin('DOT');
+      const { nonce, data: balance } = await api.query.system.account(userWalletPolkadot);
       setBalanceAmount(Number(balance.free.toString()) / 1e12);
     }
 
@@ -94,15 +90,15 @@ export default function PlaceHigherBidModal({ open, onClose, item }: { open: boo
         let Balance = await web3.eth.getBalance(window?.selectedAddress);
 
         setBalanceAmount(Number(Balance) / 1e18);
-      } catch (e) {}
+      } catch (error) {}
     }
 
-    if (VaraLoggedIn && currencyChanged == false && Coin == '') {
-      setPolkadotVara();
-    } else if (currencyChanged == true && Coin == 'VARA') {
-      switchNetworkByToken('VARA');
-      setPolkadotVara();
-    } else if (Coin !== 'VARA' && Coin !== '') {
+    if (PolkadotLoggedIn && currencyChanged == false && Coin == '') {
+      setPolkadotNetwork();
+    } else if (currencyChanged == true && Coin == 'DOT') {
+      switchNetworkByToken('DOT');
+      setPolkadotNetwork();
+    } else if (currencyChanged == true && Coin !== 'DOT' && Coin !== '') {
       switchNetworkByToken('UNQ');
       setMetamask();
     }
@@ -146,8 +142,8 @@ export default function PlaceHigherBidModal({ open, onClose, item }: { open: boo
                       <Dropdown.Option value="UNQ">
                         <MenuItem>UNQ</MenuItem>
                       </Dropdown.Option>
-                      <Dropdown.Option value="VARA">
-                        <MenuItem>VARA</MenuItem>
+                      <Dropdown.Option value="DOT">
+                        <MenuItem>DOT</MenuItem>
                       </Dropdown.Option>
                     </Dropdown.Options>
                   </Dropdown>

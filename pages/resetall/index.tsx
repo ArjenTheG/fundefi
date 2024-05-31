@@ -4,7 +4,7 @@ import React from 'react';
 import useContract from '../../services/useContract';
 
 export default function ResetDataFORM() {
-  const { contract, sendTransaction, signerAddress } = useContract();
+  const { contractUnique, sendTransaction, signerAddress } = useContract();
 
   async function resetData() {
     await sendTransaction(await window.contract.populateTransaction.reset_all());

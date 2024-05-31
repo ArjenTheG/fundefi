@@ -6,15 +6,15 @@ import Head from 'next/head';
 import useContract from '../../services/useContract';
 import PolkadotConfig from '../../contexts/json/polkadot-config.json';
 import { useRouter } from 'next/router';
-import { usePolkadotContext } from '../../contexts/PolkadotContext';
+import { useUniquePolkadotContext } from '../../contexts/UniquePolkadotContext';
 import TransactionsPanel from '../../features/TransactionsPanel';
 import BadgesPanel from '../../features/BadgesPanel';
 import CollectiblesPanel from '../../features/CollectiblesPanel';
 
 export default function Profile() {
-  const { contract } = useContract();
+  const { contractUnique } = useContract();
 
-  const { api, getUserInfoById, GetAllDaos, GetAllIdeas, GetAllGoals, GetAllJoined, GetAllVotes, GetAllUserDonations } = usePolkadotContext();
+  const { api, getUserInfoById,  GetAllJoined } = useUniquePolkadotContext();
   const [loading, setLoading] = useState(true);
   const [UserBadges, setUserBadges] = useState({
     dao: false,
@@ -36,82 +36,76 @@ export default function Profile() {
 
   useEffect(() => {
     fetchContractData();
-  }, [contract, api, router]);
+  }, [contractUnique, api, router]);
 
   async function fetchContractData() {
     let user_id = router.query.address;
     setSignerAddress(window.signerAddress);
 
-    if (!contract || !api) return false;
+    if (!contractUnique || !api) return false;
     setLoading(true);
     if (user_id == window.userid) setLoggedUser(true);
     let user_info = (await getUserInfoById(user_id)) as any;
     setUserInfo(user_info);
-    //Fetching data from Smart contract
-    let allDaos = await GetAllDaos();
-    let allJoined = await GetAllJoined();
-    let allGoals = await GetAllGoals();
-    let allIdeas = await GetAllIdeas();
-    let allVotes = await GetAllVotes();
-    let allDonations = await GetAllUserDonations();
+    // let allJoined = await GetAllJoined();
 
-    // let donated = Number(await contract._donated(Number(user_id))) / 1e18;
-    let allBadges = UserBadges;
+    // // let donated = Number(await contract._donated(Number(user_id))) / 1e18;
+    // let allBadges = UserBadges;
 
-    let total_read = 0;
-    let _message_read_ids = await contract._message_read_ids();
-    for (let i = 0; i < _message_read_ids; i++) {
-      let ReadURI = await contract.all_read_messages(i);
-      if (ReadURI.wallet == user_id) {
-        total_read += 1;
-      }
-    }
+    // let total_read = 0;
+    // let _message_read_ids = await contractUnique._message_read_ids();
+    // for (let i = 0; i < _message_read_ids; i++) {
+    //   let ReadURI = await contractUnique.all_read_messages(i);
+    //   if (ReadURI.wallet == user_id) {
+    //     total_read += 1;
+    //   }
+    // }
 
-    let founddao = [];
-    for (let i = 0; i < allDaos.length; i++) {
-      let dao_info = allDaos[i];
-      if (dao_info.user_id == user_id) {
-        dao_info.id = i;
-        let goal = allGoals.filter((e) => e.daoId == dao_info.daoId);
-        dao_info.goals = goal;
+    // let founddao = [];
+    // for (let i = 0; i < allDaos.length; i++) {
+    //   let dao_info = allDaos[i];
+    //   if (dao_info.user_id == user_id) {
+    //     dao_info.id = i;
+    //     let goal = allGoals.filter((e) => e.daoId == dao_info.daoId);
+    //     dao_info.goals = goal;
 
-        founddao.push(dao_info);
-      }
-    }
-    founddao.sort(function (a, b) {
-      return b.goals.length - a.goals.length;
-    });
+    //     founddao.push(dao_info);
+    //   }
+    // }
+    // founddao.sort(function (a, b) {
+    //   return b.goals.length - a.goals.length;
+    // });
 
-    let foundidea = allIdeas.filter((e) => Number(e.user_id) == Number(user_id));
+    // let foundidea = allIdeas.filter((e) => Number(e.user_id) == Number(user_id));
 
-    foundidea.sort(function (a, b) {
-      return b.votes - a.votes;
-    });
+    // foundidea.sort(function (a, b) {
+    //   return b.votes - a.votes;
+    // });
 
-    let foundGoals = allGoals.filter((e) => Number(e.UserId) == Number(user_id));
-    let donated = allDonations[user_id.toString()];
+    // let foundGoals = allGoals.filter((e) => Number(e.UserId) == Number(user_id));
+    // let donated = allDonations[user_id.toString()];
 
-    allBadges['dao'] = founddao.length > 0 ? true : false;
-    allBadges['joined'] = allJoined.filter((e) => Number(e.user_id) == Number(user_id)).length > 0 ? true : false;
-    allBadges['goal'] = foundGoals.length > 0 ? true : false;
-    allBadges['ideas'] = foundidea.length > 0 ? true : false;
-    allBadges['vote'] = allVotes.filter((e) => Number(e.user_id) == Number(user_id)).length > 0 ? true : false;
-    allBadges['donation'] = donated > 0 ? true : false;
+    // allBadges['dao'] = founddao.length > 0 ? true : false;
+    // allBadges['joined'] = allJoined.filter((e) => Number(e.user_id) == Number(user_id)).length > 0 ? true : false;
+    // allBadges['goal'] = foundGoals.length > 0 ? true : false;
+    // allBadges['ideas'] = foundidea.length > 0 ? true : false;
+    // allBadges['vote'] = allVotes.filter((e) => Number(e.user_id) == Number(user_id)).length > 0 ? true : false;
+    // allBadges['donation'] = donated > 0 ? true : false;
 
-    let totalDonationsRecieved = 0;
-    foundidea.forEach((e) => (totalDonationsRecieved += e.donation));
+    // let totalDonationsRecieved = 0;
+    // foundidea.forEach((e) => (totalDonationsRecieved += e.donation));
 
-    let ideasReplied = 0;
-    let _message_ids = await window.contract._message_ids();
-    for (let i = 0; i < _message_ids; i++) {
-      let messageURI = await window.contract.all_messages(i);
+    // let ideasReplied = 0;
+    // let _message_ids = await window.contract._message_ids();
+    // for (let i = 0; i < _message_ids; i++) {
+    //   let messageURI = await window.contract.all_messages(i);
 
-      if (JSON.parse(messageURI.message).userid == user_id) {
-        ideasReplied += 1;
-      }
-    }
+    //   if (JSON.parse(messageURI.message).userid == user_id) {
+    //     ideasReplied += 1;
+    //   }
+    // }
 
-    setUserBadges(allBadges);
+    // setUserBadges(allBadges);
 
     setLoading(false);
   }
@@ -120,7 +114,7 @@ export default function Profile() {
     if (localStorage.getItem('login-type') === 'polkadot') {
       window.open(`https://polkadot.js.org/apps/?rpc=${PolkadotConfig.chain_rpc}#/accounts`, '_ blank');
     } else if (localStorage.getItem('login-type') == 'metamask') {
-      window.open('https://faucet.moonbeam.network/', '_ blank');
+      window.open('https://t.me/unique2faucet_opal_bot', '_ blank');
     }
   }
 

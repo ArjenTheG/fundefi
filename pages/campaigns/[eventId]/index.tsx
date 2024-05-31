@@ -4,8 +4,7 @@ import Head from 'next/head';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
-import { usePolkadotContext } from '../../../contexts/PolkadotContext';
-import { useUniqueVaraContext } from '../../../contexts/UniqueVaraContext';
+import { useUniquePolkadotContext } from '../../../contexts/UniquePolkadotContext';
 import DonateCoinToEventModal from '../../../features/DonateCoinToEventModal';
 import useContract from '../../../services/useContract';
 import useEnvironment from '../../../services/useEnvironment';
@@ -24,10 +23,8 @@ declare let window;
 export default function Events() {
   //Variables
   const [nfts, setNfts] = useState([]);
-  const { api, getUserInfoById, GetAllDaos } = usePolkadotContext();
-  const { GetAllNfts, GetAllEvents } = useUniqueVaraContext();
+  const { api, getUserInfoById,  GetAllNfts, GetAllEvents  } = useUniquePolkadotContext();
   const [eventIdTxt, setEventTxtID] = useState('');
-  const { contract } = useContract();
   const [showCreateGoalModal, setShowDonateNFTModal] = useState(false);
   const [showDonateCoinModal, setShowDonateCoinModal] = useState(false);
   const [showPlaceHigherBidModal, setShowPlaceHigherBidModal] = useState<NFT | null>(null);
@@ -35,9 +32,8 @@ export default function Events() {
   const [loading, setLoading] = useState(true);
   const [isDistributing, setDistributing] = useState(false);
   const [tabIndex, setTabIndex] = useState(0);
-  const { sendTransaction } = useContract();
+  const { sendTransaction,contractUnique } = useContract();
 
-  const [EventDAOURI, setEventDAOURI] = useState({} as any);
   const [eventType, setEventType] = useState('polkadot');
   const [showBidHistoryModal, setShowBidHistoryModal] = useState<NFT | null>(null);
 
@@ -108,7 +104,7 @@ export default function Events() {
   useEffect(() => {
     getEventID();
     fetchData();
-  }, [contract, api, router]);
+  }, [contractUnique, api, router]);
 
   async function fetchData() {
     setEventURI(mockInfo as any);
@@ -142,9 +138,6 @@ export default function Events() {
         console.log(eventNFTs);
         setNfts(eventNFTs);
 
-        let allDaos = await GetAllDaos();
-        let eventDAO = allDaos.filter((e) => e.daoId == eventURIFull.daoId)[0];
-        setEventDAOURI(eventDAO);
 
         let user_info = await getUserInfoById(Number(eventURIFull.UserId));
         eventURIFull.user_info = user_info;

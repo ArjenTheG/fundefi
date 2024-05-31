@@ -6,13 +6,13 @@ const func = async (hre) => {
 	const { deployer } = await getNamedAccounts();
 
 
-	await deploy('DAOnation', {
+	await deploy('Fundefi', {
 		from: deployer,
 		log: true,
 	});
 
 	var fs = require('fs');
-	var json = JSON.parse(fs.readFileSync('./deployments/moonbase/DAOnation.json', 'utf8'));
+	var json = JSON.parse(fs.readFileSync('./deployments/unique/Fundefi.json', 'utf8'));
 
 	fs.writeFileSync("address.txt", json.address, {
 		encoding: 'utf8',

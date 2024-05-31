@@ -4,8 +4,7 @@ import { getChain } from '../../../services/useContract';
 import NavItem from '../../components/NavItem';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import { usePolkadotContext } from '../../../contexts/PolkadotContext';
-import { useUniqueVaraContext } from '../../../contexts/UniqueVaraContext';
+import { useUniquePolkadotContext } from '../../../contexts/UniquePolkadotContext';
 import useEnvironment from '../../../services/useEnvironment';
 import { GenericUser } from '@heathmont/moon-icons-tw';
 import CreateEventModal from '../../../features/CreateEventModal';
@@ -15,8 +14,7 @@ let running = false;
 let changedPath = true;
 
 export function Nav(): JSX.Element {
-  const { api, userInfo } = usePolkadotContext();
-  const { varaApi } = useUniqueVaraContext();
+  const { api, userInfo } = useUniquePolkadotContext();
   const [acc, setAcc] = useState('');
   const [logo, setLogo] = useState('');
   const [user_id, setUser_id] = useState(-1);
@@ -101,37 +99,6 @@ export function Nav(): JSX.Element {
         changedPath = false;
         return;
       }
-    } else if (window.localStorage.getItem('login-type') === 'polkadot-vara') {
-      const { web3Accounts, web3Enable } = require('@polkadot/extension-dapp');
-      try {
-        let wallet = (await web3Accounts())[0];
-        if (wallet && varaApi && userInfo?.fullName) {
-          const { nonce, data: balance } = await varaApi.query.system.account(wallet.address);
-
-          setCurrency('VARA');
-
-          setBalance(Number(balance.free.toString()) / 1e12 + ' VARA');
-          if (!isSigned) setSigned(true);
-
-          setAcc(userInfo?.fullName?.toString());
-          setLogo(userInfo?.imgIpfs?.toString());
-          setUser_id(window.userid);
-
-          window.document.getElementById('withoutSign').style.display = 'none';
-          window.document.getElementById('withSign').style.display = '';
-          running = false;
-          changedPath = false;
-          return;
-        } else {
-          running = false;
-          changedPath = false;
-          return;
-        }
-      } catch (e) {
-        running = false;
-        changedPath = false;
-        return;
-      }
     } else {
       setSigned(false);
       window.document.getElementById('withoutSign').style.display = '';
@@ -161,7 +128,7 @@ export function Nav(): JSX.Element {
   }, [router.pathname]);
 
   setInterval(() => {
-    if (!isServer()) {
+    if (!(typeof window === 'undefined')) {
       if (document.readyState === 'complete' && !running) {
         setCount(count + 1);
       }
@@ -169,8 +136,7 @@ export function Nav(): JSX.Element {
   }, 1000);
 
   function onClickDisConnect() {
-    router.push('/logout');
-  }
+    router.push('/logout');  }
 
   function closeModal() {
     setShowCreateEventModal(false);
@@ -212,7 +178,7 @@ export function Nav(): JSX.Element {
                     <div className="font-semibold truncate text-gohan">{Balance}</div>
                   </div>
                   <Dropdown value={null} onChange={null} position="bottom-end">
-                    <Dropdown.Trigger>
+                   <Dropdown.Trigger>
                       {logo ? (
                         <Avatar imageUrl={'https://' + logo + '.ipfs.nftstorage.link'} size="lg" className="rounded-full border-2 border-raditz"></Avatar>
                       ) : (

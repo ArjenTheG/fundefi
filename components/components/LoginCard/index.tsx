@@ -3,11 +3,11 @@ import Card from '../Card';
 import { Button } from '@heathmont/moon-core-tw';
 import { SoftwareLogin } from '@heathmont/moon-icons-tw';
 import UseFormInput from '../UseFormInput';
-import { usePolkadotContext } from '../../../contexts/PolkadotContext';
+import { useUniquePolkadotContext } from '../../../contexts/UniquePolkadotContext';
 import { toast } from 'react-toastify';
 
 const LoginCard = ({ step, onConnectMetamask, onConnectPolkadot, setStep }) => {
-  const { api, deriveAcc, showToast, EasyToast } = usePolkadotContext();
+  const { api, deriveAcc, showToast, EasyToast } = useUniquePolkadotContext();
 
   const [Email, EmailInput] = UseFormInput({
     defaultValue: '',

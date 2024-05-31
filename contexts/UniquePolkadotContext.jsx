@@ -1,52 +1,191 @@
 'use client';
 import { useContext, useEffect, useState } from 'react';
 import { createContext } from 'react';
+import { ApiPromise, WsProvider, Keyring } from '@polkadot/api';
+import polkadotConfig from './json/polkadot-config.json';
+import { toast } from 'react-toastify';
 
 const AppContext = createContext({
-  varaApi: null,
-  createEventInVara:async ()=>{},
+  api:null,
+  deriveAcc:null,
+  PolkadotLoggedIn:false,
+  userInfo:null,
+  userSigner:null,
+  userWalletPolkadot:"",
+  
+  showToast: async (status, IdOrShowAlert, FinalizedText, doAfter, callToastSuccess = true, events, ShowToast = false) => {},
+  getUserInfoById: async (userid) => {},
+  EasyToast:  (message, type, UpdateType = false, ToastId = '') => {},
+  GetAllBids: async () => [],
+  GetAllJoined: async()=>[],
   GetAllNfts: async () => [],
   GetAllEvents: async () => [],
   updateCurrentUser: () => {},
-  userWalletVara:"",
-  userSigner:null,
-  VaraLoggedIn:false,
 });
 
-export function UniqueVaraProvider({ children }) {
+export function UniquePolkadotProvider({ children }) {
   const [api, setApi] = useState();
-  const [userWalletVara, setUserWalletVara] = useState('');
-  const [VaraLoggedIn, setVaraLoggedIn] = useState(false);
+  const [deriveAcc, setDeriveAcc] = useState(null);
+  const [PolkadotLoggedIn, setPolkadotLoggedIn] = useState(false);
+  const [userInfo, setUserInfo] = useState({});
+  const [userWalletPolkadot, setUserWalletPolkadot] = useState('');
   const [userSigner, setUserSigner] = useState('');
 
 
+  async function showToast(status, IdOrShowAlert, FinalizedText, doAfter, callToastSuccess = true, events, ShowToast = false) {
+    if (status.isInBlock) {
+      if (ShowToast == false) {
+      toast.update(IdOrShowAlert, { render: 'Transaction In block...', isLoading: true });
+      }else {
+        IdOrShowAlert('pending', 'Transaction In block...');
+      }
+
+    } else if (status.isFinalized) {
+      if (callToastSuccess)
+        if (ShowToast == false) {
+          toast.update(IdOrShowAlert, {
+            render: FinalizedText,
+            type: 'success',
+            isLoading: false,
+            autoClose: 1000,
+            closeButton: true,
+            closeOnClick: true,
+            draggable: true
+          });
+        } else {
+          IdOrShowAlert('success', FinalizedText);
+        }
+
+      if (events != null) {
+        doAfter(events);
+      } else {
+        doAfter();
+      }
+    }
+  }
+
+  async function fetchPolkadotJoinedData() {
+    //Fetching data from Parachain
+    try {
+      if (api) {
+        let totalJoinedCount = Number(await api._query.daos.joinedIds());
+        let arr = [];
+        for (let i = 0; i < totalJoinedCount; i++) {
+          const element = await api._query.daos.joinedById(i);
+          let newElm = {
+            id: element['__internal__raw'].id.toString(),
+            daoId: element['__internal__raw'].daoid.toString(),
+            user_id: element['__internal__raw'].userId.toString(),
+            joined_date: element['__internal__raw'].joinedDate.toString()
+          };
+          arr.push(newElm);
+        }
+        //All DAOs Users
+        let allDaos = await GetAllDaos();
+        for (let i = 0; i < allDaos.length; i++) {
+          const element = allDaos[i];
+          let newElm = {
+            id: element.daoId,
+            daoId: element.daoId,
+            user_id: element.user_id,
+            joined_date: element.Created_Date
+          };
+          arr.push(newElm);
+        }
+
+
+        return arr;
+      }
+    } catch (error) { console.error(error) }
+    return [];
+  }
+  async function fetchContractJoinedData() {
+    //Fetching data from Smart contract
+    try {
+      if (window.contract) {
+        const totalJoined = await contract._join_ids();
+
+        const arr = [];
+        for (let i = 0; i < Number(totalJoined); i++) {
+          const joined_dao = await contract._joined_person(i);
+          arr.push(joined_dao);
+        }
+
+        return arr;
+      }
+    } catch (error) { }
+
+    return [];
+  }
+  async function GetAllJoined() {
+    let arr = [];
+    arr = arr.concat(await fetchPolkadotJoinedData());
+    arr = arr.concat(await fetchContractJoinedData());
+    return arr;
+  }
+
+  async function getUserInfoById(userid) {
+    if (api) {
+      return await api.query.users.userById(userid);
+    } else {
+      return {};
+    }
+  }
+  async function EasyToast(message, type, UpdateType = false, ToastId = '') {
+    if (UpdateType) {
+      toast.update(ToastId, {
+        render: message,
+        type: type,
+        isLoading: false,
+        autoClose: 1000,
+        closeButton: true,
+        closeOnClick: true,
+        draggable: true
+      });
+    }
+  }
 
   async function updateCurrentUser() {
     const { web3Enable, web3Accounts, web3FromAddress } = require('@polkadot/extension-dapp');
 
+    setPolkadotLoggedIn(true);
     await web3Enable('DAOnation');
     let wallet = (await web3Accounts())[0];
     const injector = await web3FromAddress(wallet.address);
 
     setUserSigner(injector.signer);
 
-    setVaraLoggedIn(true);
-    setUserWalletVara(wallet.address);
+    setUserWalletPolkadot(wallet.address);
     window.signerAddress = wallet.address;
   }
 
-  async function createEventInVara(){
-    let recipient ='5FRkiMQneH7UF2scafNXFC85QAQ4HWSLxJpM6DVeH2FRfXHq';
-    const txs = [api.tx.balances.transferAllowDeath(recipient, `${4 * 1e12}`)];
+  useEffect(() => {
+    (async function () {
+      try {
+        const wsProvider = new WsProvider(polkadotConfig.chain_rpc);
+        const _api = await ApiPromise.create({ provider: wsProvider });
+        await _api.isReady;
 
-    const transfer = await api.tx.utility.batch(txs).signAndSend(userWalletVara, { signer: userSigner }, (status) => {
-      showToast(status, id, 'Sent successfully!', () => {
+        setApi(_api);
 
-      });
-    });
-console.log(transfer);
+        const keyring = new Keyring({ type: 'sr25519' });
+        const newPair = keyring.addFromUri(polkadotConfig.derive_acc);
+        setDeriveAcc(newPair);
 
-  }
+        if (window.localStorage.getItem('loggedin') == 'true') {
+          let userid = window.localStorage.getItem('user_id');
+          window.userid = userid;
+          const userInformation = await _api.query.users.userById(userid);
+          setUserInfo(userInformation);
+
+          if (window.localStorage.getItem('login-type') == 'polkadot') {
+            updateCurrentUser();
+          }
+        }
+      } catch (e) { }
+    })();
+  }, []);
+
 
   async function InsertEventData(totalEventCount, allEvents, prefix) {
     const arr = [];
@@ -274,7 +413,7 @@ console.log(transfer);
   }
 
 
-  return <AppContext.Provider value={{varaApi:api,VaraLoggedIn:VaraLoggedIn,userWalletVara:userWalletVara,createEventInVara:createEventInVara,userSigner:userSigner, GetAllEvents:GetAllEvents,GetAllNfts: GetAllNfts,updateCurrentUser:updateCurrentUser}}>{children}</AppContext.Provider>;
+  return <AppContext.Provider value={{api:api,deriveAcc:deriveAcc,PolkadotLoggedIn:PolkadotLoggedIn,userInfo:userInfo, userWalletPolkadot:userWalletPolkadot,userSigner:userSigner,GetAllBids:GetAllBids,GetAllNfts:GetAllNfts,GetAllEvents:GetAllEvents,EasyToast:EasyToast,getUserInfoById:getUserInfoById,showToast:showToast,GetAllJoined:GetAllJoined}}>{children}</AppContext.Provider>;
 }
 
-export const useUniqueVaraContext = () => useContext(AppContext);
+export const useUniquePolkadotContext = () => useContext(AppContext);

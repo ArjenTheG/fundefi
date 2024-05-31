@@ -3,7 +3,7 @@ pragma solidity ^0.8.0;
 import '@openzeppelin/contracts/utils/Strings.sol';
 import '@openzeppelin/contracts/token/ERC20/ERC20.sol';
 
-contract DAOAuction {
+contract Fundefi {
     struct event_uri_struct {
     string dao_id;  
     uint256 user_id;

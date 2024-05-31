@@ -2,12 +2,12 @@ import { Tooltip } from '@heathmont/moon-core-tw';
 import { GenericInfo } from '@heathmont/moon-icons-tw';
 import { Table } from '@heathmont/moon-table-tw';
 import { useEffect, useMemo, useState } from 'react';
-import { usePolkadotContext } from '../../contexts/PolkadotContext';
+import { useUniquePolkadotContext } from '../../contexts/UniquePolkadotContext';
 import useEnvironment from '../../services/useEnvironment';
 import HeaderLabel from '../../components/components/HeaderLabel';
 
 const MembersTable = ({ allJoined, goals }) => {
-  const { api, GetAllDonations, GetAllIdeas, GetAllVotes, getUserInfoById } = usePolkadotContext();
+  const { api, getUserInfoById } = useUniquePolkadotContext();
   const [Data, setData] = useState([]);
 
   const columnsInitial = [
@@ -68,36 +68,36 @@ const MembersTable = ({ allJoined, goals }) => {
   async function loadData() {
     if (api) {
       let Members = [];
-      let allIdeas = await GetAllIdeas();
-      for (let i = 0; i < allJoined.length; i++) {
-        const element = allJoined[i];
-        let userInfo = await getUserInfoById(Number(element.user_id));
-        let allIdeasIds = allIdeas.map((e) => Number(e.user_id) == Number(element.user_id));
+      // let allIdeas = await GetAllIdeas();
+      // for (let i = 0; i < allJoined.length; i++) {
+      //   const element = allJoined[i];
+      //   let userInfo = await getUserInfoById(Number(element.user_id));
+      //   let allIdeasIds = allIdeas.map((e) => Number(e.user_id) == Number(element.user_id));
 
-        let allDonations = await GetAllDonations();
-        let totalAmount = 0;
-        let donations = allDonations.filter((e) => allIdeasIds.indexOf(e.ideasId) != -1);
-        donations.forEach((e) => (totalAmount += e.donation));
-        let allVotes = await GetAllVotes();
-        let votes = allVotes.filter((e) => allIdeasIds.indexOf(e.ideasId) != -1);
+      //   let allDonations = await GetAllDonations();
+      //   let totalAmount = 0;
+      //   let donations = allDonations.filter((e) => allIdeasIds.indexOf(e.ideasId) != -1);
+      //   donations.forEach((e) => (totalAmount += e.donation));
+      //   let allVotes = await GetAllVotes();
+      //   let votes = allVotes.filter((e) => allIdeasIds.indexOf(e.ideasId) != -1);
 
-        let UserCreatedGoals = goals.filter((e) => Number(e.UserId) == Number(element.user_id));
+      //   let UserCreatedGoals = goals.filter((e) => Number(e.UserId) == Number(element.user_id));
 
-        let totalVotes = 0;
-        UserCreatedGoals.forEach((e) => (totalVotes += e.votesCount));
+      //   let totalVotes = 0;
+      //   UserCreatedGoals.forEach((e) => (totalVotes += e.votesCount));
 
-        let info = {
-          name: userInfo?.fullName?.toString(),
-          joinDate: element.joined_date,
-          votePower: 1,
-          votesReceived: votes.length,
-          commentsReceived: 0,
-          donationsReceived: donations.length,
-          donated: totalAmount
-        };
+      //   let info = {
+      //     name: userInfo?.fullName?.toString(),
+      //     joinDate: element.joined_date,
+      //     votePower: 1,
+      //     votesReceived: votes.length,
+      //     commentsReceived: 0,
+      //     donationsReceived: donations.length,
+      //     donated: totalAmount
+      //   };
 
-        Members.push(info);
-      }
+      //   Members.push(info);
+      // }
 
       // let formattedData = formatData(Members);
 
