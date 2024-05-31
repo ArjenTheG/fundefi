@@ -212,7 +212,7 @@ export function Nav(): JSX.Element {
                     </Link>
                     <div className="font-semibold truncate text-gohan">{Balance}</div>
                   </div>
-                  <Dropdown value={null} onChange={null}>
+                  <Dropdown value={null} onChange={null} position="bottom-end">
                     <Dropdown.Trigger>
                       {logo ? (
                         <Avatar imageUrl={'https://' + logo + '.ipfs.nftstorage.link'} size="lg" className="rounded-full border-2 border-raditz"></Avatar>

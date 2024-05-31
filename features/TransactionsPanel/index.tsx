@@ -62,7 +62,7 @@ const TransactionsPanel = () => {
 
   return (
     <div className="max-w-full overflow-y-auto mx-4">
-      <Table columns={columns} rowSize="xl" data={mockData} isSorting={true} defaultColumn={defaultColumn} width={800} defaultRowBackgroundColor="white" evenRowBackgroundColor="white" headerBackgroundColor="trunks" />;
+      <Table columns={columns} rowSize="xl" data={mockData} isSorting={true} defaultColumn={defaultColumn} width={800} defaultRowBackgroundColor="white" evenRowBackgroundColor="white" headerBackgroundColor="trunks" />
     </div>
   );
 };
