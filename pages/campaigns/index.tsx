@@ -41,19 +41,19 @@ export default function Events() {
   return (
     <>
       <Head>
-        <title>Fundefi - Events</title>
-        <meta name="description" content="Fundefi - Events" />
+        <title>Fundefi - Campaigns</title>
+        <meta name="description" content="Fundefi - Campaigns" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <div className="flex items-center flex-col gap-8">
         <div className="gap-8 flex flex-col w-full bg-gohan pt-10 pb-6 border-beerus border">
           <div className="container flex w-full justify-between">
             <div className="flex flex-col gap-1 overflow-hidden w-full">
-              <h1 className="text-moon-32 font-bold">All events</h1>
-              <h3 className="text-trunks">Here you can find all ongoing charity events</h3>
+              <h1 className="text-moon-32 font-bold">All campaigns</h1>
+              <h3 className="text-trunks">Here you can find all ongoing campaigns</h3>
             </div>
             <Button iconLeft={<ControlsPlus />} onClick={openCreateEventModal} className="flex-shrink-0 pe-2 sm:pe-4">
-              <span className="hidden sm:inline-block">Create event</span>
+              <span className="hidden sm:inline-block">Create campaign</span>
             </Button>
           </div>
         </div>

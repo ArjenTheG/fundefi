@@ -8,7 +8,7 @@ export const Header = () => {
   const [linkTarget, setLinkTarget] = useState('/');
 
   useEffect(() => {
-    setLinkTarget(!window.userid ? '/' : '/events');
+    setLinkTarget(!window.userid ? '/' : '/campaigns');
   }, []);
 
   return (

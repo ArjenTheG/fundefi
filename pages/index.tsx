@@ -10,7 +10,7 @@ export default function Welcome() {
 
   useEffect(() => {
     if (localStorage.getItem('loggedin') && localStorage.getItem('login-type')) {
-      router.push('/events');
+      router.push('/campaigns');
     }
   }, [router]);
 

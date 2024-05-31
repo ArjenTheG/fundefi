@@ -45,7 +45,7 @@ const EventCard = ({ item, className = '', onClickDonate }: { item: CharityEvent
         </Button>
         <Link className="w-full sm:w-auto flex-1" href={`${router.pathname}/${item.eventId}`}>
           <Button className="w-full" iconLeft={<ArrowsRightShort />}>
-            Go to event
+            Go to campaign
           </Button>
         </Link>
       </div>

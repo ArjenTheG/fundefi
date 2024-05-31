@@ -205,8 +205,8 @@ export default function Events() {
   return (
     <>
       <Head>
-        <title>Event</title>
-        <meta name="description" content="Event" />
+        <title>Campaign</title>
+        <meta name="description" content="Campaign" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <div className={`flex items-center flex-col gap-8`}>
@@ -218,8 +218,8 @@ export default function Events() {
                 width={300}
                 element={
                   <h5>
-                    <Link className="text-piccolo" href="/events">
-                      &lt; Back to events
+                    <Link className="text-piccolo" href="/campaigns">
+                      &lt; Back to campaigns
                     </Link>{' '}
                   </h5>
                 }
@@ -292,7 +292,7 @@ export default function Events() {
                         Distribute NFTs to highest bidder
                       </Button>
                       <div className="flex flex-1 flex-col justify-end text-center text-trunks text-moon-12">
-                        99.9% of the proceeds go to the charity. <br /> Just 0.1% goes to DAOnation.
+                        99.9% of the proceeds go to the campaign. <br /> Just 0.1% goes to DAOnation.
                       </div>
                     </>
                   ) : (

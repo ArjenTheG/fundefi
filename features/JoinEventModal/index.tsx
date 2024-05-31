@@ -69,7 +69,7 @@ export default function JoinCommunityModal({ SubsPrice, show, onHide, address, r
       name: userInfo?.fullName?.toString()
     });
     async function onSuccess() {
-      router.push(`/events/${daoId}`);
+      router.push(`/campaigns/${daoId}`);
       LoadData();
       setisLoading(false);
       onHide({ success: true });

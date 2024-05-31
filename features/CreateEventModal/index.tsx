@@ -35,6 +35,13 @@ export default function CreateEventModal({ open, onClose, daoId }) {
     id: ''
   });
 
+  const [Organisation, OrganisationInput] = UseFormInput({
+    defaultValue: '',
+    type: 'text',
+    placeholder: 'Add organisation',
+    id: ''
+  });
+
   const [EventDescription, EventDescriptionInput] = UseFormTextArea({
     defaultValue: '',
     placeholder: 'Add Description',
@@ -220,13 +227,13 @@ export default function CreateEventModal({ open, onClose, daoId }) {
       <Modal.Panel className="bg-gohan absolute top-0 left-0 w-screen h-screen max-h-none max-w-none sm:relative sm:h-auto sm:w-[90%] sm:max-w-[600px] sm:max-h-[95vh] !rounded-none sm:!rounded-xl">
         <div className={`flex items-center justify-center flex-col`}>
           <div className="flex justify-between items-center w-full border-b border-beerus py-4 px-6">
-            <h1 className="text-moon-20 font-semibold">Create event</h1>
+            <h1 className="text-moon-20 font-semibold">Create campaign</h1>
             <IconButton className="text-trunks" variant="ghost" icon={<ControlsClose />} onClick={onClose} />
           </div>
           <div className="flex flex-col gap-6 w-full p-6  max-h-[calc(90vh-162px)] overflow-auto">
             <div className="flex flex-col gap-2">
               <h6>
-                Event name
+                Campaign name
                 <Required />
               </h6>
               {EventTitleInput}
@@ -238,6 +245,13 @@ export default function CreateEventModal({ open, onClose, daoId }) {
                 <Required />
               </h6>
               {EventDescriptionInput}
+            </div>
+            <div className="flex flex-col gap-2">
+              <h6>
+                Your organisation
+                <Required />
+              </h6>
+              {OrganisationInput}
             </div>
             <div className="flex gap-8 w-full">
               <div className="flex flex-col gap-2 w-full">
