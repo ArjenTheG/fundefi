@@ -315,7 +315,7 @@ export default function Events() {
           </div>
         )}
         {tabIndex === 1 && (
-          <div className="container mt-[-2rem] w-full flex flex-wrap gap-6">
+          <div className="container mt-[-2rem] w-full flex flex-wrap gap-6 justify-center">
             {mockNFTs.map((item, i) => (
               <NFTCard className="w-2/4" item={item} key={i} onShowBidHistory={() => setShowBidHistoryModal(item)} eventStatus={EventURI.status} onShowPlaceHigherBid={() => setShowPlaceHigherBidModal(item)} />
             ))}

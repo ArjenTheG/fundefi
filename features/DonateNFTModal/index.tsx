@@ -102,7 +102,7 @@ export default function DonateNFTModal({ open, onClose, eventName, eventid }) {
   return (
     <Modal open={open} onClose={onClose}>
       <Modal.Backdrop />
-      <Modal.Panel className="bg-gohan w-[90%] max-w-[760px] max-h-[90vh]">
+      <Modal.Panel className="bg-gohan w-[95%] max-w-[760px] max-h-[90vh]">
         <div className={`flex items-center justify-center flex-col`}>
           <div className="flex justify-between items-center w-full border-b border-beerus py-4 px-6">
             <h1 className="text-moon-20 font-semibold">Donate NFT to {eventName}</h1>

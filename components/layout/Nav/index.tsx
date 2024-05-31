@@ -184,7 +184,7 @@ export function Nav(): JSX.Element {
       <nav className="main-nav w-full flex justify-between items-center">
         <ul className="flex justify-between items-center w-full">
           {isSigned && (
-            <span className="hidden sm:inline-flex">
+            <span className="hidden md:inline-flex">
               {hasJoinedCommunities && <NavItem highlight={router.pathname === '/joined'} link="/joined" label="Joined events" />}
               <NavItem highlight={router.pathname === '/events'} link="/events" label="All events" />
               <NavItem label="Create Your Event" onClick={openModal} />
