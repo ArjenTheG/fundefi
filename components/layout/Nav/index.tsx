@@ -241,7 +241,7 @@ export function Nav(): JSX.Element {
           </li>
         </ul>
       </nav>
-      <CreateEventModal open={showCreateEventModal} onClose={closeModal} />
+      <CreateEventModal open={showCreateEventModal} onClose={closeModal} daoId={0} />
     </>
   );
 }

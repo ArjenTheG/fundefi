@@ -50,7 +50,7 @@ export default function Events() {
         </div>
       </div>
 
-      <CreateEventModal open={showCreateEventModal} onClose={closeCreateEventModal} />
+      <CreateEventModal open={showCreateEventModal} onClose={closeCreateEventModal} daoId={1} />
     </>
   );
 }

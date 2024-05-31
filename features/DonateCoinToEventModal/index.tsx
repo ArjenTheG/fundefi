@@ -6,9 +6,10 @@ import useEnvironment from '../../services/useEnvironment';
 import { useUniqueVaraContext } from '../../contexts/UniqueVaraContext';
 import { usePolkadotContext } from '../../contexts/PolkadotContext';
 import { useUtilsContext } from '../../contexts/UtilsContext';
+import { toast } from 'react-toastify';
 
 declare let window;
-export default function DonateCoinToEventModal({ open, onClose, eventName }) {
+export default function DonateCoinToEventModal({ open, onClose, eventName, eventid, recieveWallet }) {
   const [Balance, setBalance] = useState('');
   const [BalanceAmount, setBalanceAmount] = useState(0);
   const [Coin, setCoin] = useState('');
@@ -27,8 +28,40 @@ export default function DonateCoinToEventModal({ open, onClose, eventName }) {
     className: 'max-w-[140px]'
   });
 
-  async function DonateCoinSubmission() {
-    console.log('DONATE COIN');
+  async function DonateCoinSubmission(e) {
+    e.preventDefault();
+    console.clear();
+
+    const ToastId = toast.loading('Donating....');
+
+    setIsLoading(true);
+
+    let feed = JSON.stringify({
+      donated: Amount,
+      eventTitle: eventName,
+      eventid: eventid
+    });
+
+    async function onSuccess() {
+      window.location.reload();
+      LoadData();
+      setIsLoading(false);
+
+      onClose({ success: true });
+    }
+
+    toast.update(ToastId, { render: 'Sending Transaction...', isLoading: true });
+
+    let methodWithSignature = await window.contractUnique.populateTransaction.add_donation(eventid, `${Amount * 1e18}`, feed);
+    const tx = {
+      ...methodWithSignature,
+      value: `${Amount * 1e18}`
+    };
+    await (await window.signer.sendTransaction(tx)).wait();
+
+    toast.update(ToastId, { render: 'Success!', isLoading: false, type: 'success' });
+
+    onSuccess();
   }
 
   async function LoadData(currencyChanged = false) {
@@ -40,20 +73,23 @@ export default function DonateCoinToEventModal({ open, onClose, eventName }) {
     }
 
     async function setMetamask() {
-      const Web3 = require('web3');
-      const web3 = new Web3(window.ethereum);
-      let Balance = await web3.eth.getBalance(window?.selectedAddress);
+      try {
+        const Web3 = require('web3');
+        const web3 = new Web3(window.ethereum);
+        let Balance = await web3.eth.getBalance(window?.selectedAddress);
 
-      setBalance((Balance / 1e18).toFixed(5));
+        setBalance((Balance / 1e18).toFixed(5));
+        setBalanceAmount(Number(Balance) / 1e18);
+      } catch (error) {}
     }
 
-    if (PolkadotLoggedIn && currencyChanged == false && Coin == '') {
+    if (false && currencyChanged == false && Coin == '') {
       setPolkadotVara();
     } else if (currencyChanged == true && Coin == 'VARA') {
       switchNetworkByToken('VARA');
       setPolkadotVara();
     } else if (currencyChanged == true && Coin !== 'VARA' && Coin !== '') {
-      await window.ethereum.enable();
+      switchNetworkByToken('UNQ');
       setMetamask();
     }
   }
@@ -78,7 +114,7 @@ export default function DonateCoinToEventModal({ open, onClose, eventName }) {
             <IconButton className="text-trunks" variant="ghost" icon={<ControlsClose />} onClick={onClose} />
           </div>
           <div className="flex flex-col gap-6 w-full max-h-[calc(90vh-162px)]">
-            <form id="donateForm" autoComplete="off">
+            <form id="doanteForm" autoComplete="off">
               <div className="flex flex-col gap-2 py-16 px-6">
                 <div className="flex items-center ">
                   <span className="font-semibold flex-1">Total</span>
@@ -95,8 +131,21 @@ export default function DonateCoinToEventModal({ open, onClose, eventName }) {
                     </Dropdown.Options>
                   </Dropdown>
                 </div>
-
-                <p className="text-trunks w-full text-right">Your balance will be {Number(BalanceAmount) - Amount + ' ' + getCurrency()} </p>
+                {Coin == '' ? (
+                  <></>
+                ) : (
+                  <>
+                    {Number(BalanceAmount) - Amount < 1 ? (
+                      <>
+                        <p className=" w-full text-right text-chichi">Insufficent Balance </p>
+                      </>
+                    ) : (
+                      <>
+                        <p className="text-trunks w-full text-right">Your balance will be {Number(BalanceAmount) - Amount + ' ' + Coin} </p>
+                      </>
+                    )}
+                  </>
+                )}
               </div>
 
               <div className="flex justify-between border-t border-beerus w-full p-6">

@@ -16,7 +16,9 @@ import { NFT } from '../../../data-model/nft';
 import NFTCard from '../../../components/components/NFTCard';
 import BidHistoryModal from '../../../features/BidHistoryModal';
 import PlaceHigherBidModal from '../../../features/PlaceHigherBidModal';
+import { toast } from 'react-toastify';
 
+declare let window;
 export default function Events() {
   //Variables
   const [nfts, setNfts] = useState([]);
@@ -26,13 +28,16 @@ export default function Events() {
   const { contract } = useContract();
   const [showCreateGoalModal, setShowDonateNFTModal] = useState(false);
   const [showDonateCoinModal, setShowDonateCoinModal] = useState(false);
+  const [showPlaceHigherBidModal, setShowPlaceHigherBidModal] = useState<NFT | null>(null);
   const [EventID, setEventID] = useState(-1);
   const [loading, setLoading] = useState(true);
+  const [isDistributing, setDistributing] = useState(false);
   const [tabIndex, setTabIndex] = useState(0);
+  const { sendTransaction } = useContract();
 
+  const [EventDAOURI, setEventDAOURI] = useState({} as any);
   const [eventType, setEventType] = useState('polkadot');
   const [showBidHistoryModal, setShowBidHistoryModal] = useState<NFT | null>(null);
-  const [showPlaceHigherBidModal, setShowPlaceHigherBidModal] = useState<NFT | null>(null);
 
   const router = useRouter();
   const { getCurrency } = useEnvironment();
@@ -112,13 +117,7 @@ export default function Events() {
     if (!eventIdParam) {
       return;
     }
-
-    const split = eventIdParam.split('_');
-    const type = eventIdParam.startsWith('m_') ? 'metamask' : 'polkadot';
-    const id = split[1];
-
-    setEventType(type);
-    setEventID(Number(id));
+    setEventID(Number(eventIdParam));
     setEventTxtID(eventIdParam);
   }
 
@@ -133,13 +132,16 @@ export default function Events() {
 
         let allNfts = await GetAllNfts();
         let eventNFTs = allNfts.filter((e) => e.eventid == eventIdTxt.toString());
-
+        console.log(eventNFTs);
         setNfts(eventNFTs);
 
         let allDaos = await GetAllDaos();
+        let eventDAO = allDaos.filter((e) => e.daoId == eventURIFull.daoId)[0];
+        setEventDAOURI(eventDAO);
 
         let user_info = await getUserInfoById(Number(eventURIFull.UserId));
         eventURIFull.user_info = user_info;
+        eventURIFull.isOwner = eventURIFull.UserId == Number(window.userid);
 
         setEventURI(eventURIFull);
         setLoading(false);
@@ -168,8 +170,29 @@ export default function Events() {
     setShowDonateNFTModal(true);
   }
 
-  function distributeNFTs() {
-    console.log('DISTRIBUTE NFTs');
+  async function distributeNFTs() {
+    setDistributing(true);
+
+    console.log('======================>Distributing NFT');
+    const ToastId = toast.loading('Distributing NFT ...');
+
+    try {
+      // Creating Event in Smart contract
+      await sendTransaction(await window.contractUnique.populateTransaction.distribute_nft_to_highest_bidder(Number(EventID)));
+      toast.update(ToastId, {
+        render: 'Distributed NFTs!',
+        type: 'success',
+        isLoading: false,
+        autoClose: 1000,
+        closeButton: true,
+        closeOnClick: true,
+        draggable: true
+      });
+    } catch (e) {
+      console.error(e);
+    }
+    setDistributing(false);
+    window.location.reload();
   }
 
   return (
@@ -188,7 +211,10 @@ export default function Events() {
                 width={300}
                 element={
                   <h5 className="font-semibold">
-                    <Link className="text-raditz" href={`../../${router.query.daoId}`}></Link> &gt; Event
+                    <Link className="text-piccolo" href={`../../${router.query.daoId}`}>
+                      {EventDAOURI?.Title}
+                    </Link>{' '}
+                    &gt; Event
                   </h5>
                 }
               />
@@ -198,11 +224,11 @@ export default function Events() {
                 width={770}
                 element={
                   <h3 className="flex gap-2 whitespace-nowrap">
-                    <div>{EventURI.status}</div>
+                    <div>{EventURI.status == 'ended' ? 'Ended' : ''}</div>
                     <div>•</div>
                     <div className="flex">
                       Created by &nbsp;
-                      <a href={'/profile/' + EventURI.user_info.id} className="truncate text-raditz max-w-[120px]">
+                      <a href={'/profile/' + EventURI.user_info.id} className="truncate text-piccolo max-w-[120px]">
                         @{EventURI.user_info.fullName}
                       </a>
                     </div>
@@ -211,27 +237,18 @@ export default function Events() {
               />
             </div>
             <div className="flex flex-col gap-2 absolute top-0 right-0">
-              {/* {(isOwner || isJoined) && ( */}
-              <Button iconLeft={<GenericLoyalty />} onClick={openDonateNFTModal}>
-                Donate NFT
-              </Button>
-              <Button iconLeft={<ShopWallet />} onClick={openDonateCoinModal}>
-                Donate Coin
-              </Button>
-              {/* )} */}
-
-              {/* {isOwner && (
-                <Link href={`/DesignDao?[${daoIdTxt}]`}>
-                  <Button iconLeft={<GenericEdit />} variant="secondary" className="w-full">
-                    Edit
+              {EventURI.status == 'ended' ? (
+                <></>
+              ) : (
+                <>
+                  <Button iconLeft={<GenericLoyalty />} onClick={openDonateNFTModal}>
+                    Donate NFT
                   </Button>
-                </Link>
-              )} */}
-              {/* {isOwner && (
-                <Button iconLeft={<GenericDelete />} className="bg-raditz" onClick={deleteDao}>
-                  Delete
-                </Button>
-              )} */}
+                  <Button iconLeft={<ShopWallet />} onClick={openDonateCoinModal}>
+                    Donate Coin
+                  </Button>
+                </>
+              )}
             </div>
           </div>
           <div className="container">
@@ -253,27 +270,41 @@ export default function Events() {
               <div className="font-bold text-moon-20">
                 Raised {getCurrency()} {EventURI.reached} of {EventURI.Budget}
               </div>
-              <div className="text-trunks text-center">NFT donations are put up for bidding at the event</div>
-              <Button className="font-bold" onClick={distributeNFTs}>
-                Distribute NFTs to highest bidder
-              </Button>
-              <div className="flex flex-1 flex-col justify-end text-center text-trunks text-moon-12">
-                99.9% of the proceeds go to the charity. <br /> Just 0.1% goes to Fundefi.
-              </div>
+              {EventURI.status == 'ended' ? (
+                <>
+                  <div className="text-chichi text-center">Auction Ended</div>
+                </>
+              ) : (
+                <>
+                  {EventURI.isOwner ? (
+                    <>
+                      <div className="text-trunks text-center">NFT donations are put up for bidding at the event</div>
+                      <Button animation={isDistributing ? 'progress' : false} disabled={isDistributing} className="font-bold" onClick={distributeNFTs}>
+                        Distribute NFTs to highest bidder
+                      </Button>
+                      <div className="flex flex-1 flex-col justify-end text-center text-trunks text-moon-12">
+                        99.9% of the proceeds go to the charity. <br /> Just 0.1% goes to DAOnation.
+                      </div>
+                    </>
+                  ) : (
+                    <></>
+                  )}
+                </>
+              )}
             </div>
           </div>
         )}
         {tabIndex === 1 && (
           <div className="container mt-[-2rem] w-full flex flex-wrap gap-6">
             {nfts.map((item, i) => (
-              <NFTCard className="w-2/4" item={item} key={i} onShowBidHistory={() => setShowBidHistoryModal(item)} onShowPlaceHigherBid={() => setShowPlaceHigherBidModal(item)} />
+              <NFTCard className="w-2/4" item={item} key={i} onShowBidHistory={() => setShowBidHistoryModal(item)} eventStatus={EventURI.status} onShowPlaceHigherBid={() => setShowPlaceHigherBidModal(item)} />
             ))}
           </div>
         )}
       </div>
 
       <DonateNFTModal open={showCreateGoalModal} onClose={closeDonateNFTModal} eventid={eventIdTxt} eventName={EventURI.Title} />
-      <DonateCoinToEventModal open={showDonateCoinModal} onClose={closeDonateCoinModal} eventName={EventURI.Title} />
+      <DonateCoinToEventModal open={showDonateCoinModal} onClose={closeDonateCoinModal} eventName={EventURI.Title} eventid={EventID} recieveWallet={EventURI.wallet} />
       <PlaceHigherBidModal open={!!showPlaceHigherBidModal} onClose={() => setShowPlaceHigherBidModal(null)} item={showPlaceHigherBidModal} />
       <BidHistoryModal open={!!showBidHistoryModal} onClose={() => setShowBidHistoryModal(null)} item={showBidHistoryModal} />
     </>
