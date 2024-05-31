@@ -107,7 +107,7 @@ export default function DonateCoinToEventModal({ open, onClose, eventName, event
   return (
     <Modal open={open} onClose={onClose}>
       <Modal.Backdrop />
-      <Modal.Panel className="min-w-[480px] bg-gohan">
+      <Modal.Panel className="sm:min-w-[480px] min-w-[95%] bg-gohan">
         <div className="flex items-center justify-center flex-col">
           <div className="flex justify-between items-center w-full border-b border-beerus py-4 px-6">
             <h1 className="text-moon-20 font-semibold">Donate to {eventName}</h1>

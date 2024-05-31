@@ -13,4 +13,5 @@ export interface CharityEvent {
   reached: number;
   amountOfNFTs: number;
   status: string;
+  user_info: { id; fullName };
 }

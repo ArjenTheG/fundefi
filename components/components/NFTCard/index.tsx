@@ -10,7 +10,7 @@ const NFTCard = ({ item, eventStatus, className, onShowBidHistory, onShowPlaceHi
   const { getCurrency } = useEnvironment();
 
   return (
-    <Card className={`flex max-w-[388px] flex-col !p-6 gap-5 items-center ${className}`}>
+    <Card className={`flex sm:max-w-[388px] flex-col !p-6 gap-5 items-center ${className}`}>
       <div className="h-40 w-40 rounded-lg border border-beerus relative overflow-hidden">
         <Image unoptimized={true} src={item.url} alt="" layout="fill" objectFit="cover" />
       </div>

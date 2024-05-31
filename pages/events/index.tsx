@@ -1,10 +1,10 @@
 import Head from 'next/head';
 import EventCard from '../../components/components/EventCard';
-import { CharityEvent } from '../../data-model/event';
 import CreateEventModal from '../../features/CreateEventModal';
 import { useState } from 'react';
 import { ControlsPlus } from '@heathmont/moon-icons-tw';
 import { Button } from '@heathmont/moon-core-tw';
+import DonateCoinToEventModal from '../../features/DonateCoinToEventModal';
 
 let mockEvents: any[] = [
   { eventId: '1', Title: 'Annual Food Drive', End_Date: new Date(), amountOfNFTs: 8, Budget: 1000, reached: 200.53, logo: 'https://www.efsa.europa.eu/sites/default/files/news/food-donations.jpg' },
@@ -13,10 +13,24 @@ let mockEvents: any[] = [
 
 export default function Events() {
   const [showCreateEventModal, setShowCreateEventModal] = useState(false);
+  const [showDonateCoinModal, setShowDonateCoinModal] = useState(false);
+  const [eventForDonation, setEventForDonation] = useState({ Title: '', eventId: null, wallet: '' });
 
   function closeCreateEventModal(event) {
     if (event) {
       setShowCreateEventModal(false);
+    }
+  }
+
+  function openDonateCoinModal(selectedEvent) {
+    setEventForDonation(selectedEvent);
+    setShowDonateCoinModal(true);
+  }
+
+  function closeDonateCoinModal(event) {
+    if (event) {
+      setEventForDonation({ Title: '', eventId: null, wallet: '' });
+      setShowDonateCoinModal(false);
     }
   }
 
@@ -45,11 +59,12 @@ export default function Events() {
         </div>
         <div className="container flex flex-col gap-8 items-center">
           {mockEvents.map((event, index) => (
-            <EventCard item={event} key={index} />
+            <EventCard item={event} key={index} onClickDonate={() => openDonateCoinModal(event)} />
           ))}
         </div>
       </div>
 
+      <DonateCoinToEventModal open={showDonateCoinModal} onClose={closeDonateCoinModal} eventName={eventForDonation.Title} eventid={eventForDonation.eventId} recieveWallet={eventForDonation.wallet} />
       <CreateEventModal open={showCreateEventModal} onClose={closeCreateEventModal} daoId={1} />
     </>
   );

@@ -1,5 +1,5 @@
 import { Button, Tabs } from '@heathmont/moon-core-tw';
-import { GenericLoyalty, ShopWallet } from '@heathmont/moon-icons-tw';
+import { GenericEdit, GenericLoyalty, ShopWallet } from '@heathmont/moon-icons-tw';
 import Head from 'next/head';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
@@ -17,6 +17,8 @@ import NFTCard from '../../../components/components/NFTCard';
 import BidHistoryModal from '../../../features/BidHistoryModal';
 import PlaceHigherBidModal from '../../../features/PlaceHigherBidModal';
 import { toast } from 'react-toastify';
+import { formatDistanceToNow } from 'date-fns';
+import { CharityEvent } from '../../../data-model/event';
 
 declare let window;
 export default function Events() {
@@ -59,15 +61,17 @@ export default function Events() {
     status: ''
   });
 
-  const mockInfo = {
-    title: 'Annual Food Drive',
-    date: 'Annual Food Drive',
-    image: 'https://marketplace.canva.com/EAFG5wKTkFk/1/0/1131w/canva-pastel-food-drive-a4-flyer-tBm19VC3AKU.jpg',
-    userInfo: { fullName: 'Thomas Goethals', id: 1 },
-    eventTarget: 50,
-    eventRaised: 75,
-    status: 'Ended',
-    charity: { title: 'Feeding America' }
+  const currentDate = new Date();
+  const futureDate = new Date(currentDate.setDate(currentDate.getDate() + 3));
+
+  const mockInfo: Partial<CharityEvent> = {
+    Title: 'Annual Food Drive',
+    logo: 'https://marketplace.canva.com/EAFG5wKTkFk/1/0/1131w/canva-pastel-food-drive-a4-flyer-tBm19VC3AKU.jpg',
+    user_info: { fullName: 'Thomas Goethals', id: 1 },
+    reached: 50,
+    Budget: 75,
+    status: 'Busy',
+    End_Date: futureDate.getTime() as any
   };
 
   const mockNFTs: NFT[] = [
@@ -107,6 +111,9 @@ export default function Events() {
   }, [contract, api, router]);
 
   async function fetchData() {
+    setEventURI(mockInfo as any);
+    setLoading(false);
+
     if (router.query.daoId) {
       fetchContractDataFull();
     }
@@ -204,17 +211,16 @@ export default function Events() {
       </Head>
       <div className={`flex items-center flex-col gap-8`}>
         <div className={`gap-8 flex flex-col w-full bg-gohan pt-10 border-beerus border`}>
-          <div className="container flex w-full justify-between relative">
+          <div className="container flex flex-col sm:flex-row gap-6 w-full justify-between relative">
             <div className="flex flex-col gap-1">
               <Loader
                 loading={loading}
                 width={300}
                 element={
-                  <h5 className="font-semibold">
-                    <Link className="text-piccolo" href={`../../${router.query.daoId}`}>
-                      {EventDAOURI?.Title}
+                  <h5>
+                    <Link className="text-piccolo" href="/events">
+                      &lt; Back to events
                     </Link>{' '}
-                    &gt; Event
                   </h5>
                 }
               />
@@ -224,11 +230,11 @@ export default function Events() {
                 width={770}
                 element={
                   <h3 className="flex gap-2 whitespace-nowrap">
-                    <div>{EventURI.status == 'ended' ? 'Ended' : ''}</div>
+                    <div className="font-bold text-piccolo">{EventURI.status === 'ended' ? 'Ended' : EventURI.End_Date ? formatDistanceToNow(EventURI.End_Date as any) : ''} left</div>
                     <div>•</div>
                     <div className="flex">
-                      Created by &nbsp;
-                      <a href={'/profile/' + EventURI.user_info.id} className="truncate text-piccolo max-w-[120px]">
+                      by&nbsp;
+                      <a href={'/profile/' + EventURI.user_info.id} className="truncate text-piccolo max-w-[200px]">
                         @{EventURI.user_info.fullName}
                       </a>
                     </div>
@@ -236,16 +242,19 @@ export default function Events() {
                 }
               />
             </div>
-            <div className="flex flex-col gap-2 absolute top-0 right-0">
+            <div className="flex flex-col gap-2">
               {EventURI.status == 'ended' ? (
                 <></>
               ) : (
                 <>
-                  <Button iconLeft={<GenericLoyalty />} onClick={openDonateNFTModal}>
+                  <Button className="hidden sm:flex" iconLeft={<GenericLoyalty />} onClick={openDonateNFTModal}>
                     Donate NFT
                   </Button>
-                  <Button iconLeft={<ShopWallet />} onClick={openDonateCoinModal}>
+                  <Button className="hidden sm:flex" iconLeft={<ShopWallet />} onClick={openDonateCoinModal}>
                     Donate Coin
+                  </Button>
+                  <Button variant="secondary" iconLeft={<GenericEdit />}>
+                    Edit
                   </Button>
                 </>
               )}
@@ -261,11 +270,11 @@ export default function Events() {
           </div>
         </div>
         {tabIndex === 0 && (
-          <div className="container mt-[-2rem] w-full flex gap-6">
-            <div className="w-full max-w-[476px] h-[476px] overflow-hidden relative">
+          <div className="container mt-[-2rem] w-full flex-col sm:flex-row flex gap-6 pb-6">
+            <div className="w-full sm:max-w-[476px] h-[476px] overflow-hidden relative">
               <Image unoptimized={true} objectFit="cover" layout="fill" className="rounded-xl object-cover" src={EventURI.logo} alt="" />
             </div>
-            <div className="flex flex-col gap-5 bg-gohan rounded-xl w-full max-w-[300px] items-center p-6 pt-10 shadow-moon-lg">
+            <div className="flex flex-col gap-5 bg-gohan rounded-xl w-full sm:max-w-[300px] items-center p-6 pt-10 shadow-moon-lg">
               <GenericLoyalty className="text-hit text-moon-48" />
               <div className="font-bold text-moon-20">
                 Raised {getCurrency()} {EventURI.reached} of {EventURI.Budget}
@@ -287,7 +296,18 @@ export default function Events() {
                       </div>
                     </>
                   ) : (
-                    <></>
+                    <>
+                      <div className="text-trunks text-center">NFTs funded are put up for bidding at the event.</div>
+                      <div className="flex flex-col gap-2 w-full">
+                        <Button className="w-full" iconLeft={<GenericLoyalty />} onClick={openDonateNFTModal}>
+                          Fund with NFT
+                        </Button>
+                        <Button className="w-full" iconLeft={<ShopWallet />} onClick={openDonateCoinModal}>
+                          Fund with Coin
+                        </Button>
+                      </div>
+                      <div className="text-trunks text-moon-14 text-center">99.9% of the proceeds go to the charity. Just 0.1% goes to Fundefi.</div>
+                    </>
                   )}
                 </>
               )}
@@ -296,7 +316,7 @@ export default function Events() {
         )}
         {tabIndex === 1 && (
           <div className="container mt-[-2rem] w-full flex flex-wrap gap-6">
-            {nfts.map((item, i) => (
+            {mockNFTs.map((item, i) => (
               <NFTCard className="w-2/4" item={item} key={i} onShowBidHistory={() => setShowBidHistoryModal(item)} eventStatus={EventURI.status} onShowPlaceHigherBid={() => setShowPlaceHigherBidModal(item)} />
             ))}
           </div>
