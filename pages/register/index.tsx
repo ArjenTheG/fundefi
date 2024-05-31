@@ -78,7 +78,7 @@ export default function Register() {
         <meta name="description" content="Fundefi - Register" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <div className="flex items-center flex-col gap-8">
+      <div className="flex items-center flex-col gap-8 pb-10">
         <div className="gap-8 flex flex-col w-full bg-gohan pt-10 pb-6 border-beerus border">
           <div className="container flex w-full justify-between">
             <div className="flex flex-col gap-1 overflow-hidden">

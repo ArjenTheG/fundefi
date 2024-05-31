@@ -16,7 +16,7 @@ export default function Login() {
 
   useEffect(() => {
     if ((hasMetamask || hasPolkadot) && isConnected) {
-      window.location.href = '/joined';
+      window.location.href = '/campaigns';
     }
   }, [hasMetamask, hasPolkadot, isConnected, router]); // Dependency array
 
@@ -115,7 +115,7 @@ export default function Login() {
           <p>Step {step} of 2</p>
         </div>
       </div>
-      <div className="container flex flex-col items-center pt-10 gap-10">{<LoginCard setStep={setStep} step={step} onConnectPolkadot={onConnectPolkadot} onConnectMetamask={onConnectMetamask} />}</div>
+      <div className="container flex flex-col items-center py-10 gap-10">{<LoginCard setStep={setStep} step={step} onConnectPolkadot={onConnectPolkadot} onConnectMetamask={onConnectMetamask} />}</div>
     </>
   );
 }
