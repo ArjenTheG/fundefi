@@ -15,7 +15,7 @@ export default function PlaceHigherBidModal({ open, onClose, item }: { open: boo
 
   const { userInfo, PolkadotLoggedIn,userWalletPolkadot,api } = useUniquePolkadotContext();
   const [BalanceAmount, setBalanceAmount] = useState(0);
-  const [Coin, setCoin] = useState('UNQ');
+  const [Coin, setCoin] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const { switchNetworkByToken }: { switchNetworkByToken: Function } = useUtilsContext();
 
@@ -94,6 +94,7 @@ export default function PlaceHigherBidModal({ open, onClose, item }: { open: boo
     }
 
     if (PolkadotLoggedIn && currencyChanged == false && Coin == '') {
+      switchNetworkByToken('DOT');
       setPolkadotNetwork();
     } else if (currencyChanged == true && Coin == 'DOT') {
       switchNetworkByToken('DOT');

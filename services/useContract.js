@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { ethers } from 'ethers';
+import chains from "./json/chains.json";
 import {ERC20Unique} from './ERC20Singleton';
 import Fundefi from '../contracts/deployments/unique/Fundefi.json';
 let UniqueProviderURL = 'https://rpc-opal.unique.network';

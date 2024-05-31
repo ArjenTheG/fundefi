@@ -2,6 +2,7 @@
 import { useContext, useEffect, useState } from 'react';
 import { createContext } from 'react';
 import { ApiPromise, WsProvider, Keyring } from '@polkadot/api';
+
 import polkadotConfig from './json/polkadot-config.json';
 import { toast } from 'react-toastify';
 
@@ -20,7 +21,7 @@ const AppContext = createContext({
   GetAllJoined: async()=>[],
   GetAllNfts: async () => [],
   GetAllEvents: async () => [],
-  updateCurrentUser: () => {},
+  updateCurrentUser:async () => {},
 });
 
 export function UniquePolkadotProvider({ children }) {
@@ -68,20 +69,20 @@ export function UniquePolkadotProvider({ children }) {
     //Fetching data from Parachain
     try {
       if (api) {
-        let totalJoinedCount = Number(await api._query.daos.joinedIds());
+        let totalJoinedCount = Number(await api._query.events.joinedIds());
         let arr = [];
         for (let i = 0; i < totalJoinedCount; i++) {
-          const element = await api._query.daos.joinedById(i);
+          const element = await api._query.events.joinedById(i);
           let newElm = {
             id: element['__internal__raw'].id.toString(),
-            daoId: element['__internal__raw'].daoid.toString(),
+            eventId: element['__internal__raw'].eventId.toString(),
             user_id: element['__internal__raw'].userId.toString(),
             joined_date: element['__internal__raw'].joinedDate.toString()
           };
           arr.push(newElm);
         }
         //All DAOs Users
-        let allDaos = await GetAllDaos();
+        let allDaos = await GetAllEvents();
         for (let i = 0; i < allDaos.length; i++) {
           const element = allDaos[i];
           let newElm = {
@@ -187,8 +188,9 @@ export function UniquePolkadotProvider({ children }) {
   }, []);
 
 
-  async function InsertEventData(totalEventCount, allEvents, prefix) {
-    const arr = [];
+  async function InsertEventData(totalEventCount, allEvents, prefix,allEventRaised=[]) {
+   
+    let arr = [];
     for (let i = 0; i < totalEventCount; i++) {
       let object = '';
       let daoId = "";
@@ -196,35 +198,45 @@ export function UniquePolkadotProvider({ children }) {
       let nft_raised  = 0;
       let totalNfts = 0;
       let eventId = prefix + i;
+      let originalwallet = '';
 
       if (prefix == 'm_') {
         object = JSON.parse(allEvents[i].event_uri);
-        daoId = allEvents[i].dao_id;
-         nft_raised = Number(await contractUnique.get_event_reached(i));
-         totalNfts = Number(await contractUnique.get_event_nft_count(i));
+        originalwallet = allEvents[i].event_wallet;
+         nft_raised = Number(await contractUnique.get_event_reached(eventId));
+         totalNfts = Number(await contractUnique.get_event_nft_count(eventId));
       } else {
+        originalwallet = allEvents[i].eventWallet.toString();
         if (allEvents[i]?.eventUri) {
           object = JSON.parse(allEvents[i].eventUri?.toString());
-          daoId = allEvents[i].daoId.toString();
         }
       }
-      reached =  Number(allEvents[i].raised)/1e18 + nft_raised/1e18 ;
+      let eventRaised = allEventRaised.filter((item)=>item.eventId == eventId);
+      for (let i = 0; i < eventRaised.length; i++) {
+        const element = eventRaised[i];
+        reached +=element.amount;
+        
+      }
+      reached +=   nft_raised/1e18 ;
 
 
       if (object) {
+        let user_info = await getUserInfoById(object.properties?.user_id?.description);
         arr.push({
           //Pushing all data into array
           id: i,
-          eventId: i,
+          eventId: eventId,
           daoId: daoId,
           Title: object.properties.Title.description,
           Description: object.properties.Description.description,
           Budget: object.properties.Budget.description,
           End_Date: object.properties.End_Date.description,
           wallet: object.properties.wallet.description,
+          recievewallet: originalwallet,
           UserId: object.properties?.user_id?.description,
           logo: object.properties.logo.description?.url,
           type: prefix == 'm_' ? 'Polkadot' : 'EVM',
+          user_info:user_info,
           reached: reached,
           amountOfNFTs:totalNfts,
           status:allEvents[i].status
@@ -235,7 +247,8 @@ export function UniquePolkadotProvider({ children }) {
   }
 
 
-  async function fetchPolkadotEventData() {
+  async function fetchPolkadotEventData(allEventRaised) {
+    
     //Fetching data from Parachain
     try {
       if (api) {
@@ -252,13 +265,15 @@ export function UniquePolkadotProvider({ children }) {
           return arr;
         };
 
-        let arr = InsertEventData(totalEventCount, await totalEvent(), 'p_');
+        let arr =await InsertEventData(totalEventCount, await totalEvent(), 'p_',allEventRaised);
         return arr;
       }
-    } catch (error) { }
+    } catch (error) { 
+      console.error(error);
+    }
     return [];
   }
-  async function fetchContractEventData() {
+  async function fetchContractEventData(allEventRaised) {
     //Fetching data from Smart contract
     try {
       if (window.contractUnique) {
@@ -272,7 +287,7 @@ export function UniquePolkadotProvider({ children }) {
           }
           return arr;
         }
-        let arr = InsertEventData(totalEventCount, await totalEvent(), 'm_');
+        let arr = await InsertEventData(totalEventCount, await totalEvent(), 'm_',allEventRaised);
         return arr;
 
       }
@@ -281,14 +296,91 @@ export function UniquePolkadotProvider({ children }) {
     return [];
   }
   async function GetAllEvents() {
+    let allEventRaised =await GetAllEventRaised();
     let arr = [];
-    // arr = arr.concat(await fetchPolkadotEventData());
-    arr = arr.concat(await fetchContractEventData());
+    arr = arr.concat(await fetchPolkadotEventData(allEventRaised));
+    arr = arr.concat(await fetchContractEventData(allEventRaised));
     return arr;
   }
 
 
 
+  async function InsertEventRaisedData(totalEventRaisedCount, allEventRaiseds, prefix) {
+   
+    for (let i = 0; i < totalEventRaisedCount; i++) {
+      let element = allEventRaiseds[i];
+      let newElm={}
+      if (prefix == 'm_') {
+        newElm = {
+          id: i,
+          eventId: element.event_id.toString(),
+          amount:Number(element.amount)/1e18,
+        };
+
+      } else {
+        newElm = {
+          id: element.id.toString(),
+          eventId: element.eventId.toString(),
+          amount:Number(element.amount),
+        };
+      }
+      arr.push(newElm);
+    }
+    return arr;
+  }
+
+
+  async function fetchPolkadotEventRaised() {
+    //Fetching data from Parachain
+    try {
+      if (api) {
+        let totalEventRaisedCount = Number(await api._query.events._donations_ids());
+
+        let totalEventRaised = async () => {
+          let arr = [];
+          for (let i = 0; i < totalEventRaisedCount; i++) {
+            const element = await api._query.events.DonationById(i);
+            let donationURI = element['__internal__raw'];
+
+            arr.push(donationURI);
+          }
+          return arr;
+        };
+
+        let arr = await InsertEventRaisedData(totalEventRaisedCount, await totalEventRaised(), 'p_');
+        return arr;
+      }
+    } catch (error) { }
+    return [];
+  }
+  async function fetchContractEvenRaised() {
+    //Fetching data from Smart contract
+    try {
+      if (window.contractUnique) {
+
+        const totalEventRaisedCount = Number(await contractUnique._donations_ids());
+        let totalEventRaised = async () => {
+          const arr = [];
+          for (let i = 0; i < Number(totalEventRaisedCount); i++) {
+            const event_info = await contractUnique._donations(i);
+            arr.push(event_info);
+          }
+          return arr;
+        }
+        let arr = await InsertEventRaisedData(totalEventRaisedCount, await totalEventRaised(), 'm_');
+        return arr;
+
+      }
+    } catch (error) { }
+
+    return [];
+  }
+  async function GetAllEventRaised() {
+    let arr = [];
+    arr = arr.concat(await fetchPolkadotEventRaised());
+    arr = arr.concat(await fetchContractEvenRaised());
+    return arr;
+  }
 
   async function InsertNftData(totalNftCount, allNfts, prefix,allBids = []) {
     const arr = [];
@@ -413,7 +505,7 @@ export function UniquePolkadotProvider({ children }) {
   }
 
 
-  return <AppContext.Provider value={{api:api,deriveAcc:deriveAcc,PolkadotLoggedIn:PolkadotLoggedIn,userInfo:userInfo, userWalletPolkadot:userWalletPolkadot,userSigner:userSigner,GetAllBids:GetAllBids,GetAllNfts:GetAllNfts,GetAllEvents:GetAllEvents,EasyToast:EasyToast,getUserInfoById:getUserInfoById,showToast:showToast,GetAllJoined:GetAllJoined}}>{children}</AppContext.Provider>;
+  return <AppContext.Provider value={{api:api,deriveAcc:deriveAcc,PolkadotLoggedIn:PolkadotLoggedIn,userInfo:userInfo,updateCurrentUser:updateCurrentUser, userWalletPolkadot:userWalletPolkadot,userSigner:userSigner,GetAllBids:GetAllBids,GetAllNfts:GetAllNfts,GetAllEvents:GetAllEvents,EasyToast:EasyToast,getUserInfoById:getUserInfoById,showToast:showToast,GetAllJoined:GetAllJoined}}>{children}</AppContext.Provider>;
 }
 
 export const useUniquePolkadotContext = () => useContext(AppContext);

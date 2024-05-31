@@ -48,7 +48,7 @@ export function Nav(): JSX.Element {
           setLogo(userInfo.imgIpfs?.toString());
           setUser_id(window.userid);
 
-          setBalance(Balance / 1e18 + token);
+          setBalance((Balance / 1e18).toFixed(2) + token);
 
           if (!isSigned) setSigned(true);
 
@@ -77,7 +77,7 @@ export function Nav(): JSX.Element {
 
           setCurrency('DOT');
 
-          setBalance(Number(balance.free.toString()) / 1e12 + ' DOT');
+          setBalance((Number(balance.free.toString()) / 1e12).toFixed(2) + ' DOT');
           if (!isSigned) setSigned(true);
 
           setAcc(userInfo?.fullName?.toString());
@@ -206,7 +206,7 @@ export function Nav(): JSX.Element {
           </li>
         </ul>
       </nav>
-      <CreateEventModal open={showCreateEventModal} onClose={closeModal} daoId={0} />
+      <CreateEventModal open={showCreateEventModal} onClose={closeModal} />
     </>
   );
 }

@@ -52,6 +52,7 @@ export default function Events() {
     },
     reached: false,
     wallet: '',
+    type:"",
     logo: '',
     isOwner: true,
     status: ''
@@ -110,7 +111,7 @@ export default function Events() {
     setEventURI(mockInfo as any);
     setLoading(false);
 
-    if (router.query.daoId) {
+    if (router.query.eventId) {
       fetchContractDataFull();
     }
   }
@@ -120,8 +121,14 @@ export default function Events() {
     if (!eventIdParam) {
       return;
     }
-    setEventID(Number(eventIdParam));
+    const split = eventIdParam.split('_');
+    const type = eventIdParam.startsWith('m_') ? 'metamask' : 'polkadot';
+    const id = split[1];
+
+    setEventType(type);
+    setEventID(Number(id));
     setEventTxtID(eventIdParam);
+
   }
 
   async function fetchContractDataFull() {
@@ -138,9 +145,6 @@ export default function Events() {
         console.log(eventNFTs);
         setNfts(eventNFTs);
 
-
-        let user_info = await getUserInfoById(Number(eventURIFull.UserId));
-        eventURIFull.user_info = user_info;
         eventURIFull.isOwner = eventURIFull.UserId == Number(window.userid);
 
         setEventURI(eventURIFull);
@@ -220,10 +224,10 @@ export default function Events() {
               <Loader loading={loading} width={300} element={<h1 className="text-moon-32 font-bold">{EventURI.Title}</h1>} />
               <Loader
                 loading={loading}
-                width={770}
+                width={'100%'}
                 element={
                   <h3 className="flex gap-2 whitespace-nowrap">
-                    <div className="font-bold text-piccolo">{EventURI.status === 'ended' ? 'Ended' : EventURI.End_Date ? formatDistanceToNow(EventURI.End_Date as any) : ''} left</div>
+                    <div className="font-bold text-piccolo">{EventURI.status === 'ended' ? 'Ended' : EventURI.End_Date ? formatDistanceToNow(new Date(EventURI.End_Date)) : ''} left</div>
                     <div>•</div>
                     <div className="flex">
                       by&nbsp;
@@ -240,10 +244,10 @@ export default function Events() {
                 <></>
               ) : (
                 <>
-                  <Button className="hidden sm:flex" iconLeft={<GenericLoyalty />} onClick={openDonateNFTModal}>
+                  <Button className=" sm:flex" iconLeft={<GenericLoyalty />} onClick={openDonateNFTModal}>
                     Donate NFT
                   </Button>
-                  <Button className="hidden sm:flex" iconLeft={<ShopWallet />} onClick={openDonateCoinModal}>
+                  <Button className=" sm:flex" iconLeft={<ShopWallet />} onClick={openDonateCoinModal}>
                     Donate Coin
                   </Button>
                   <Button variant="secondary" iconLeft={<GenericEdit />}>
@@ -317,7 +321,7 @@ export default function Events() {
       </div>
 
       <DonateNFTModal open={showCreateGoalModal} onClose={closeDonateNFTModal} eventid={eventIdTxt} eventName={EventURI.Title} />
-      <DonateCoinToEventModal open={showDonateCoinModal} onClose={closeDonateCoinModal} eventName={EventURI.Title} eventid={EventID} recieveWallet={EventURI.wallet} />
+      <DonateCoinToEventModal open={showDonateCoinModal} onClose={closeDonateCoinModal} eventName={EventURI.Title} eventid={EventID} recieveWallet={EventURI.wallet} recievetype={EventURI.type} />
       <PlaceHigherBidModal open={!!showPlaceHigherBidModal} onClose={() => setShowPlaceHigherBidModal(null)} item={showPlaceHigherBidModal} />
       <BidHistoryModal open={!!showBidHistoryModal} onClose={() => setShowBidHistoryModal(null)} item={showBidHistoryModal} />
     </>

@@ -8,12 +8,12 @@ import { useUtilsContext } from '../../contexts/UtilsContext';
 import { toast } from 'react-toastify';
 
 declare let window;
-export default function DonateCoinToEventModal({ open, onClose, eventName, eventid, recieveWallet }) {
+export default function DonateCoinToEventModal({ open, onClose, eventName, eventid,address, recieveWallet,recievetype }) {
   const [Balance, setBalance] = useState('');
   const [BalanceAmount, setBalanceAmount] = useState(0);
   const [Coin, setCoin] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const { api,PolkadotLoggedIn, userWalletPolkadot } = useUniquePolkadotContext();
+  const { api,PolkadotLoggedIn, userWalletPolkadot,updateCurrentUser,showToast,userSigner } = useUniquePolkadotContext();
   const { switchNetworkByToken }: { switchNetworkByToken: Function } = useUtilsContext();
 
   const [Amount, AmountInput] = UseFormInput({
@@ -47,22 +47,43 @@ export default function DonateCoinToEventModal({ open, onClose, eventName, event
     }
 
     toast.update(ToastId, { render: 'Sending Transaction...', isLoading: true });
+   
+    if (Coin == 'DOT') {
+      let recipient = recievetype == 'Polkadot' ? recieveWallet : address;
+      const txs = [api.tx.balances.transferAllowDeath(recipient, `${Amount * 1e12}`), api._extrinsics.ideas.addDonation(eventid, `${Amount * 1e12}`, Number(window.userid))];
 
-    let methodWithSignature = await window.contractUnique.populateTransaction.add_donation(eventid, `${Amount * 1e18}`, feed);
-    const tx = {
-      ...methodWithSignature,
-      value: `${Amount * 1e18}`
-    };
-    await (await window.signer.sendTransaction(tx)).wait();
-
-    toast.update(ToastId, { render: 'Success!', isLoading: false, type: 'success' });
-
-    onSuccess();
+      const transfer = api.tx.utility.batch(txs).signAndSend(userWalletPolkadot, { signer: userSigner }, (status) => {
+        showToast(
+          status,
+          ToastId,
+          'Donation successful!',
+          () => {
+            onSuccess();
+          },
+          true,
+          null,
+          true
+        );
+      });
+    } else{
+      let methodWithSignature = await window.contractUnique.populateTransaction.add_donation(eventid, `${Amount * 1e18}`, feed);
+      const tx = {
+        ...methodWithSignature,
+        value: `${Amount * 1e18}`
+      };
+      await (await window.signer.sendTransaction(tx)).wait();
+  
+      toast.update(ToastId, { render: 'Success!', isLoading: false, type: 'success' });
+  
+      onSuccess();
+    }
+   
   }
 
   async function LoadData(currencyChanged = false) {
     async function setPolkadotNetwork() {
       if (Coin !== 'DOT') setCoin('DOT');
+      updateCurrentUser();
       const { nonce, data: balance } = await api.query.system.account(userWalletPolkadot);
       setBalance((Number(balance.free.toString()) / 1e12).toString());
       setBalanceAmount(Number(balance.free.toString()) / 1e12);
@@ -80,6 +101,7 @@ export default function DonateCoinToEventModal({ open, onClose, eventName, event
     }
 
     if (PolkadotLoggedIn && currencyChanged == false && Coin == '') {
+      switchNetworkByToken('DOT');
       setPolkadotNetwork();
     } else if (currencyChanged == true && Coin == 'DOT') {
       switchNetworkByToken('DOT');

@@ -14,12 +14,14 @@ import useEnvironment from '../../services/useEnvironment';
 import { useUniquePolkadotContext } from '../../contexts/UniquePolkadotContext';
 declare let window;
 let addedDate = false;
-export default function CreateEventModal({ open, onClose, daoId }) {
+export default function CreateEventModal({ open, onClose }) {
   const [EventImage, setEventImage] = useState([]);
   const [creating, setCreating] = useState(false);
   const { sendTransaction } = useContract();
   const { api, userInfo, showToast, userWalletPolkadot, userSigner, PolkadotLoggedIn } = useUniquePolkadotContext();
   const { isServer } = useEnvironment();
+  const [RecieveType, setRecieveType] = useState('EVM');
+
 
   //Storage API for images and videos
   const NFT_STORAGE_TOKEN = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkaWQ6ZXRocjoweDJDMDBFOGEzZEEwNzA5ZkI5MUQ1MDVmNDVGNUUwY0Q4YUYyRTMwN0MiLCJpc3MiOiJuZnQtc3RvcmFnZSIsImlhdCI6MTY1NDQ3MTgxOTY2NSwibmFtZSI6IlplbmNvbiJ9.6znEiSkiLKZX-a9q-CKvr4x7HS675EDdaXP622VmYs8';
@@ -60,6 +62,13 @@ export default function CreateEventModal({ open, onClose, daoId }) {
     placeholder: '0.00',
     id: 'event'
   });
+  const [RecieveWallet, RecieveWalletInput, setRecieveWallet] = UseFormInput({
+    defaultValue: '',
+    type: 'text',
+    placeholder: `Wallet Address (${RecieveType})`,
+    id: 'recipient'
+  });
+
 
   async function CheckTransaction() {
     let params = new URL(window.location.href).searchParams;
@@ -103,6 +112,10 @@ export default function CreateEventModal({ open, onClose, daoId }) {
           type: 'string',
           description: EventDescription
         },
+        Organisation: {
+          type: 'string',
+          description: Organisation
+        },
         Budget: {
           type: 'string',
           description: Budget
@@ -117,7 +130,7 @@ export default function CreateEventModal({ open, onClose, daoId }) {
         },
         wallet: {
           type: 'string',
-          description: window.signerAddress
+          description: RecieveWallet
         },
         logo: {
           type: 'string',
@@ -131,7 +144,6 @@ export default function CreateEventModal({ open, onClose, daoId }) {
 
     let feed = {
       name: userInfo?.fullName,
-      daoId: daoId,
       eventid: null,
       budget: Budget
     };
@@ -144,7 +156,7 @@ export default function CreateEventModal({ open, onClose, daoId }) {
     if (PolkadotLoggedIn) {
       let eventid = Number(await api._query.events.eventIds());
       feed.eventid = 'p_' + eventid;
-      const txs = [api._extrinsics.events.createEvent(JSON.stringify(createdObject), daoId, Number(window.userid), JSON.stringify(feed)), api._extrinsics.feeds.addFeed(JSON.stringify(feed), 'event', new Date().valueOf())];
+      const txs = [api._extrinsics.events.createEvent(JSON.stringify(createdObject),  Number(window.userid), userWalletPolkadot,JSON.stringify(feed))];
       const transfer = api.tx.utility.batch(txs).signAndSend(userWalletPolkadot, { signer: userSigner }, (status) => {
         showToast(status, ToastId, 'Created successfully!', () => {
           onSuccess();
@@ -156,7 +168,7 @@ export default function CreateEventModal({ open, onClose, daoId }) {
         feed.eventid = eventid;
 
         // Creating Event in Smart contract
-        await sendTransaction(await window.contractUnique.populateTransaction.create_event(JSON.stringify(createdObject), window.selectedAddress, daoId, Number(window.userid), JSON.stringify(feed)));
+        await sendTransaction(await window.contractUnique.populateTransaction.create_event(JSON.stringify(createdObject), window.selectedAddress, Number(window.userid), JSON.stringify(feed)));
         toast.update(ToastId, {
           render: 'Created Successfully!',
           type: 'success',
@@ -221,13 +233,13 @@ export default function CreateEventModal({ open, onClose, daoId }) {
   return (
     <Modal open={open} onClose={onClose}>
       <Modal.Backdrop />
-      <Modal.Panel className="bg-gohan absolute top-0 left-0 w-screen h-screen max-h-none max-w-none sm:relative sm:h-auto sm:w-[90%] sm:max-w-[600px] sm:max-h-[95vh] !rounded-none sm:!rounded-xl">
+      <Modal.Panel className="bg-gohan absolute top-0 left-0 w-screen h-screen max-w-none sm:relative sm:h-auto sm:w-[90%] sm:max-w-[600px]  !rounded-none sm:!rounded-xl">
         <div className={`flex items-center justify-center flex-col`}>
           <div className="flex justify-between items-center w-full border-b border-beerus py-4 px-6">
             <h1 className="text-moon-20 font-semibold">Create campaign</h1>
             <IconButton className="text-trunks" variant="ghost" icon={<ControlsClose />} onClick={onClose} />
           </div>
-          <div className="flex flex-col gap-6 w-full p-6  max-h-[calc(90vh-162px)] overflow-auto">
+          <div className="flex flex-col gap-6 w-full p-6 overflow-auto">
             <div className="flex flex-col gap-2">
               <h6>
                 Campaign name
@@ -249,6 +261,13 @@ export default function CreateEventModal({ open, onClose, daoId }) {
                 <Required />
               </h6>
               {OrganisationInput}
+            </div> 
+            <div className="flex flex-col gap-2">
+              <h6>
+              Recipeint
+                <Required />
+              </h6>
+              {RecieveWalletInput}
             </div>
             <div className="flex gap-8 w-full">
               <div className="flex flex-col gap-2 w-full">

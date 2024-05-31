@@ -7,11 +7,32 @@ import { CharityEvent } from '../../../data-model/event';
 import Link from 'next/link';
 import { Button } from '@heathmont/moon-core-tw';
 import { useRouter } from 'next/router';
+import { intervalToDuration, isPast, parseISO } from 'date-fns';
 
 const EventCard = ({ item, className = '', onClickDonate }: { item: CharityEvent; className?: string; onClickDonate?: MouseEventHandler }) => {
   const [showPlaceholder, setShowPlaceholder] = useState(false);
   const router = useRouter();
   const { getCurrency } = useEnvironment();
+   // Format the duration
+   let formattedDuration = '';
+   const todayISO = new Date().toISOString().split('T')[0];
+   const startDate = new Date(todayISO);
+   let hasAlreadyPast = false;
+ 
+   if (item.End_Date) {
+     const endDate = new Date(item.End_Date);
+ 
+     const duration = intervalToDuration({ start: startDate, end: endDate });
+ 
+     formattedDuration += duration.days > 0 ? `${duration.days} days ` : '';
+     formattedDuration += duration.hours > 0 ? `${duration.hours} hours ` : '';
+     formattedDuration += duration.minutes > 0 ? `and ${duration.minutes} min` : '';
+     formattedDuration = formattedDuration.trim();
+ 
+     hasAlreadyPast = isPast(endDate) ;
+   } else {
+     hasAlreadyPast = true;
+   }
 
   return (
     <Card className={`max-w-[720px] flex flex-col gap-4 relative ${className}`}>
@@ -23,7 +44,7 @@ const EventCard = ({ item, className = '', onClickDonate }: { item: CharityEvent
         <div className="flex flex-1 flex-col gap-2 relative px-5 text-moon-16">
           <p className="font-semibold text-moon-18">{item.Title}</p>
           <p className="text-trunks">
-            By {'Thomas Goethals'} <br /> Ends in 4h25m
+            By {item.user_info?.fullName} <br /> {hasAlreadyPast?<><span className='text-chichi'>Ended</span></>:"Ends in " +formattedDuration}
           </p>
           <div className="sm:inline-block">
             <p className="font-semibold text-moon-20 text-hit">
@@ -39,10 +60,14 @@ const EventCard = ({ item, className = '', onClickDonate }: { item: CharityEvent
           </div>
         </div>
       </div>
+
       <div className="flex gap-2 relative sm:absolute sm:bottom-6 sm:right-6">
+        {hasAlreadyPast?<></>:<>
         <Button className="w-full sm:w-auto flex-1" variant="secondary" iconLeft={<ShopWallet />} onClick={onClickDonate}>
           Donate
         </Button>
+        </>}
+       
         <Link className="w-full sm:w-auto flex-1" href={`${router.pathname}/${item.eventId}`}>
           <Button className="w-full" iconLeft={<ArrowsRightShort />}>
             Go to campaign
